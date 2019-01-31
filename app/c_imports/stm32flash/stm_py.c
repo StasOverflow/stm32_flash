@@ -20,7 +20,7 @@
 #include "parsers/binary.h"
 #include "parsers/hex.h"
 
-static void close_with_argument( PyObject *self, int ret );
+static void close_with_argument( PyObject *self, int ret, int flag, unsigned long addr );
 
 static PyObject* polled_method(PyObject * self, PyObject * args, PyObject * keywds);
 static PyObject* pull_method(PyObject * self, PyObject * args, PyObject * keywds);
@@ -101,7 +101,7 @@ static PyObject* open_da_port(PyObject *self, PyObject *args, PyObject *keywds)
     if (port_open(&port_opts, &port) != PORT_ERR_OK)
     {
 		printf("Failed to open port: %s\n", port_opts.device);
-		close_with_argument(self, 1);
+		close_with_argument(self, 1, 0, 0);
 		return Py_None;
 	}
 	else
@@ -182,7 +182,7 @@ static PyObject* init_da_parser(PyObject * self, PyObject *args, PyObject *keywd
 			if (!p_st)
 			{
 				printf("%s Parser failed to initialize\n", parser->name);
-                close_with_argument(self, 1);
+                close_with_argument(self, 1, 0, 0);
                 return Py_None;
 			}
 		}
@@ -203,7 +203,7 @@ static PyObject* init_da_parser(PyObject * self, PyObject *args, PyObject *keywd
 				if (!p_st)
 				{
 					printf("%s Parser failed to initialize\n", parser->name);
-                    close_with_argument(self, 1);
+                    close_with_argument(self, 1, 0, 0);
                     return Py_None;
 				}
 				perr = parser->open(p_st, file_path, 0);
@@ -218,7 +218,7 @@ static PyObject* init_da_parser(PyObject * self, PyObject *args, PyObject *keywd
 				    perror(file_path);
 				}
 
-                close_with_argument(self, 1);
+                close_with_argument(self, 1, 0, 0);
                 return Py_None;
 			}
 		}
@@ -231,15 +231,15 @@ static PyObject* init_da_parser(PyObject * self, PyObject *args, PyObject *keywd
 		{
 			printf("%s Parser failed to initialize\n", parser->name);
 
-            close_with_argument(self, 1);
+            close_with_argument(self, 1, 0, 0);
             return Py_None;
             // Insert Close goto close;
 		}
 	}
 
-    Py_XDECREF(kwlist);
-    Py_XDECREF(args);
-    Py_XDECREF(keywds);
+//    Py_XDECREF(kwlist);
+//    Py_XDECREF(args);
+//    Py_XDECREF(keywds);
 
     return Py_None;
 }
@@ -259,7 +259,7 @@ static PyObject* open_with_parser(PyObject * self, PyObject *args, PyObject *key
 
     Py_XDECREF(kwlist);
     Py_XDECREF(args);
-    Py_XDECREF(keywds);
+//    Py_XDECREF(keywds);
 
     return Py_None;
 }
@@ -299,21 +299,21 @@ static PyObject* init_da_stm(PyObject * self, PyObject * args, PyObject * keywds
         return NULL;
     }
 
-//    close_da_stm(self, NULL);
+    close_da_stm(self, NULL);
 
     if( port )
     {
         if (init_flag && init_bl_entry(port, gpio_seq) == 0)
         {
             printf("Something went wrong with init bl stuff \n");
-            close_with_argument(self, 1);
+            close_with_argument(self, 1, 0, 0);
             return Py_None;
         }
         stm = stm32_init(port, init_flag);
         if (!stm)
         {
             printf("stm somehow didn't manage to launch \n");
-            close_with_argument(self, 1);
+            close_with_argument(self, 1, 0, 0);
             return Py_None;
         }
         else
@@ -325,7 +325,7 @@ static PyObject* init_da_stm(PyObject * self, PyObject * args, PyObject * keywds
     {
         // raise some ERROR: Unitialized based crap
         printf("INIT DA PORT AT THE FIRST PLACE, PLEASE \n");
-		close_with_argument(self, 1);
+		close_with_argument(self, 1, 0, 0);
 		return Py_None;
     }
 
@@ -363,7 +363,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
     unsigned long   start_addr      = 0;
     unsigned long   readwrite_len   = 0;
     int             no_erase        = 0;
-    int				npages          = 0;
+    int				npages          = 30;
     int             spage           = 0;
     int             reset_flag      = 0;
     int             verify          = 0;
@@ -383,7 +383,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                         "verify",
                         "retry",
                         "execute_flag",
-                        "execute_addr"
+                        "execute_addr",
 
                          NULL
                     };
@@ -420,7 +420,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
     if( !stm )
     {
         printf("im sorry, but you will have to initialize stm struct in the first place \n");
-		close_with_argument(self, 1);
+		close_with_argument(self, 1, 0, 0);
 		return Py_None;
     }
     else
@@ -428,7 +428,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
         if( !p_st )
         {
             printf("Initiate the parser on the first place \n");
-            close_with_argument(self, ret);
+            close_with_argument(self, ret, exec_flag, execute_addr);
             return Py_None;
         }
         else
@@ -485,13 +485,14 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 if (start > stm->dev->fl_end)
                 {
                     printf("Address range exceeds flash size.\n");
-                    close_with_argument(self, ret);
+                    close_with_argument(self, ret, exec_flag, execute_addr);
                     return Py_None;
                 }
 
                 if (npages)
                 {
                     num_pages = npages;
+                    printf("Erasing wery special count of pages %d \n", npages);
                     end = flash_page_to_addr(first_page + num_pages);
                     if (end > stm->dev->fl_end)
                     {
@@ -529,7 +530,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                     {
                         perror(file_path);
                     }
-                    close_with_argument(self, ret);
+                    close_with_argument(self, ret, exec_flag, execute_addr);
                     return Py_None;
                     // Insert Close goto close;
                 }
@@ -544,7 +545,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                     {
                         printf("Failed to read memory at address 0x%08lx, target write-protected?\n", addr);
 
-                        close_with_argument(self, ret);
+                        close_with_argument(self, ret, exec_flag, execute_addr);
                         return Py_None;
                         // Insert Close goto close;
                     }
@@ -552,7 +553,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                     {
                         printf("Failed to write data to file\n");
 
-                        close_with_argument(self, ret);
+                        close_with_argument(self, ret, exec_flag, execute_addr);
                         return Py_None;
                         // Insert Close goto close;
                     }
@@ -570,7 +571,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 printf("Done, now close all stuff\n");
 
                 ret = 0;
-                close_with_argument(self, ret);
+                close_with_argument(self, ret, exec_flag, execute_addr);
                 return Py_None;
                 // Insert Close goto close;
 
@@ -605,7 +606,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 {
                     printf("Specified start & length are invalid (must be page aligned)\n");
                     ret = 1;
-                    close_with_argument(self, ret);
+                    close_with_argument(self, ret, exec_flag, execute_addr);
                     return Py_None;
                 }
 
@@ -614,7 +615,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 {
                     printf("Failed to erase memory\n");
                     ret = 1;
-                    close_with_argument(self, ret);
+                    close_with_argument(self, ret, exec_flag, execute_addr);
                     return Py_None;
                 }
             }
@@ -666,11 +667,23 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 if (!no_erase && num_pages)
                 {
                     printf("Erasing memory\n");
-                    s_err = stm32_erase_memory(stm, first_page, num_pages);
+                    printf("Bifor s_err \n");
+                    if( stm )
+                    {
+//                        s_err = stm32_erase_memory(stm, first_page, num_pages);
+                    }
+                    else
+                    {
+                        printf("Shit was about to happen, but we prevented it by printing this garbage text \n");
+                        close_with_argument(self, ret, exec_flag, execute_addr);
+                        return Py_None;
+                    }
+
+                    printf("after s_err \n");
                     if (s_err != STM32_ERR_OK)
                     {
                         printf("Failed to erase memory\n");
-                        close_with_argument(self, ret);
+                        close_with_argument(self, ret, exec_flag, execute_addr);
                         return Py_None;
                     }
                 }
@@ -685,7 +698,8 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
 
                     if (parser->read(p_st, buffer, &len) != PARSER_ERR_OK)
                     {
-                        close_with_argument(self, ret);
+                        printf("parser ne ok \n");
+                        close_with_argument(self, ret, exec_flag, execute_addr);
                         return Py_None;
                     }
 
@@ -697,7 +711,8 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                         }
                         else
                         {
-                            close_with_argument(self, ret);
+                            printf("failed some filename shit \n");
+                            close_with_argument(self, ret, exec_flag, execute_addr);
                             return Py_None;
                         }
                     }
@@ -705,11 +720,12 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
 
                     while( failed < retry )
                     {
+//                        printf("Here Here, %d/%d \n", failed, retry);
                         s_err = stm32_write_memory(stm, addr, buffer, len);
                         if (s_err != STM32_ERR_OK)
                         {
                             printf("Failed to write memory at address 0x%08lx\n", addr);
-                            close_with_argument(self, ret);
+                            close_with_argument(self, ret, exec_flag, execute_addr);
                             return Py_None;
                         }
                         if (verify)
@@ -726,7 +742,7 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                                 if (s_err != STM32_ERR_OK)
                                 {
                                     printf("Failed to read memory at address 0x%08lx\n", addr + offset);
-                                    close_with_argument(self, ret);
+                                    close_with_argument(self, ret, exec_flag, execute_addr);
                                     return Py_None;
                                 }
                                 offset += rlen;
@@ -743,32 +759,36 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                                             buffer [r],
                                             compare[r]
                                         );
-                                        close_with_argument(self, ret);
+                                        close_with_argument(self, ret, exec_flag, execute_addr);
                                         return Py_None;
                                     }
                                     ++failed;
                                 }
                             }
                         }
+//                        printf("Breaking bad \n");
+//                        failed = 10;
+                        break;
                     }
                     failed = 0;
 
                     addr	+= len;
                     offset	+= len;
 
-//                    fprintf(diag,
-//                        "\rWrote %saddress 0x%08x (%.2f%%) ",
-//                        verify ? "and verified " : "",
-//                        addr,
-//                        (100.0f / size) * offset
-//                    );
+                    printf(
+                        "\rWrote %saddress 0x%08lx (%.2f%%) ",
+                        verify ? "and verified " : "",
+                        addr,
+                        (100.0f / size) * offset
+                    );
 //                    fflush(diag);
 
                 }
 
                 printf("Done.\n");
                 ret = 0;
-                close_with_argument(self, ret);
+                printf("exec flag before entering close function is %d \n", exec_flag);
+                close_with_argument(self, ret, exec_flag, execute_addr);
                 return Py_None;
             }
             else
@@ -782,20 +802,20 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                 if (s_err != STM32_ERR_OK)
                 {
                     printf("Failed to read CRC\n");
-                    close_with_argument(self, ret);
+                    close_with_argument(self, ret, exec_flag, execute_addr);
                     return Py_None;
                 }
                 printf("CRC(0x%08lx-0x%08lx) = 0x%08lx\n", start, end, crc_val);
 
                 ret = 0;
-                close_with_argument(self, ret);
+                close_with_argument(self, ret, exec_flag, execute_addr);
                 return Py_None;
             }
             else
             {
                 printf("No concrette action specified \n");
                 ret = 0;
-                close_with_argument(self, ret);
+                close_with_argument(self, ret, exec_flag, execute_addr);
                 return Py_None;
             }
         }
@@ -828,7 +848,10 @@ static PyObject* closing_sequence(PyObject * self, PyObject * args, PyObject * k
     }
     else
     {
-        if( !p_st )
+
+        printf("Execu flago is %d \n", exec_flag);
+
+        if( p_st )
         {
             if (stm && exec_flag && ret == 0)
             {
@@ -872,19 +895,26 @@ static PyObject* closing_sequence(PyObject * self, PyObject * args, PyObject * k
 	{
 	    printf("Closing parser \n");
 	    parser->close(p_st);
+	    p_st = NULL;
 	}
 
 	if( stm )
 	{
 	    printf("Closing stm \n");
-	    stm32_close  (stm);
+	    stm32_close(stm);
+	    stm = NULL;
 	}
 
 	if (port)
 	{
 	    printf("Closing port \n");
 		port->close(port);
+		port = NULL;
 	}
+
+	Py_XDECREF(args);
+	Py_XDECREF(kwlist);
+//	Py_XDECREF(keywds);
 
     return Py_None;
 //	fprintf(diag, "\n");
@@ -949,7 +979,7 @@ static PyObject* polled_method(PyObject * self, PyObject * args, PyObject * keyw
 
     Py_XDECREF(kwlist);
     Py_XDECREF(args);
-    Py_XDECREF(keywds);
+//    Py_XDECREF(keywds);
 
 
     return Py_None;
@@ -986,7 +1016,7 @@ static PyObject* pull_method(PyObject * self, PyObject * args, PyObject * keywds
 
     Py_XDECREF(kwlist);
     Py_XDECREF(args);
-    Py_XDECREF(keywds);
+//    Py_XDECREF(keywds);
 
     Py_XDECREF(argumentio1);
     Py_XDECREF(argumentio2);
@@ -1006,15 +1036,15 @@ static void close_with_argument( PyObject *self, int ret, int flag, unsigned lon
     PyObject *exec = Py_BuildValue("i", flag);
     PyObject *exec_addr = Py_BuildValue("k", addr);
     PyObject *keywords = PyDict_New();
-
+//
     PyDict_SetItem(keywords, PyUnicode_FromString("ret"), ret_val);
-    PyDict_SetItem(keywords, PyUnicode_FromString("exec_flag"), flag);
-    PyDict_SetItem(keywords, PyUnicode_FromString("execute_addr"), addr);
-
+    PyDict_SetItem(keywords, PyUnicode_FromString("exec_flag"), exec);
+    PyDict_SetItem(keywords, PyUnicode_FromString("execute_addr"), exec_addr);
+//
     PyObject *myobject_method = PyObject_GetAttrString(self, "close_all");
 
     PyObject *result = PyObject_Call(myobject_method, args, keywords);
-
+//
     Py_XDECREF(args);
     Py_XDECREF(ret_val);
     Py_XDECREF(exec);

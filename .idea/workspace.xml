@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9bb54633-d125-479c-a46c-7d226cb92b21" name="Default Changelist" comment="" />
+    <list default="true" id="9bb54633-d125-479c-a46c-7d226cb92b21" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/dev_table.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/dev_table.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/i2c.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/i2c.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/init.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/init.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/main.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/main.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/parsers/parsers.a" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/parsers/parsers.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/port.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/port.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/serial_common.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/serial_common.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/serial_platform.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/serial_platform.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/stm32.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/stm32.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/stm32flash.exe" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/stm32flash.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/c_imports/stm32flash/utils.o" beforeDir="false" afterPath="$PROJECT_DIR$/app/c_imports/stm32flash/utils.o" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,8 +31,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/main.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="531">
-                  <caret line="580" lean-forward="true" selection-start-line="580" selection-end-line="580" />
+                <state relative-caret-position="-1337">
+                  <caret line="649" column="29" lean-forward="true" selection-start-line="649" selection-start-column="29" selection-end-line="649" selection-end-column="29" />
                 </state>
               </provider>
             </entry>
@@ -24,7 +40,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm32.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="579">
+                <state relative-caret-position="6001">
                   <caret line="353" column="46" selection-start-line="353" selection-start-column="46" selection-end-line="353" selection-end-column="46" />
                 </state>
               </provider>
@@ -47,8 +63,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="14662">
-                  <caret line="995" column="32" lean-forward="true" selection-start-line="995" selection-start-column="32" selection-end-line="995" selection-end-column="32" />
+                <state relative-caret-position="375">
+                  <caret line="1025" column="32" selection-start-line="1025" selection-start-column="32" selection-end-line="1025" selection-end-column="32" />
                 </state>
               </provider>
             </entry>
@@ -100,12 +116,12 @@
         </leaf>
       </split-first>
       <split-second>
-        <leaf>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="463">
-                  <caret line="1020" column="26" lean-forward="true" selection-start-line="1020" selection-start-column="26" selection-end-line="1020" selection-end-column="26" />
+                <state relative-caret-position="-1150">
+                  <caret line="1050" column="26" lean-forward="true" selection-start-line="1050" selection-start-column="26" selection-end-line="1050" selection-end-column="26" />
                 </state>
               </provider>
             </entry>
@@ -123,40 +139,43 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>crc_val</find>
-      <find>Failed to read</find>
-      <find>filename</find>
-      <find>filepath</find>
-      <find>fileN</find>
-      <find>again</find>
-      <find>filler</find>
-      <find>c_init</find>
-      <find>goto agai</find>
-      <find>retry</find>
-      <find>exec_flag</find>
-      <find>reset</find>
-      <find>reset_flag</find>
-      <find>clo</find>
-      <find>``</find>
-      <find>close</find>
-      <find>gpio_seq</find>
-      <find>gpio_</find>
       <find>to cl</find>
       <find>parser_init</find>
       <find>init_da</find>
       <find>ret</find>
       <find>perror</find>
       <find>exe</find>
-      <find>execute</find>
       <find>execute_addr</find>
-      <find>close_with_argument</find>
+      <find>exec_ad</find>
+      <find>close_dar</find>
       <find>close_all</find>
       <find>closing_sequence</find>
-      <find>exec_ad</find>
+      <find>close_with_argument( PyObject *self,</find>
+      <find>close_w</find>
+      <find>first_page</find>
+      <find>Py_Xd</find>
+      <find>PyD</find>
+      <find>execute</find>
+      <find>wrote a</find>
+      <find>Bifor s_err\\</find>
+      <find>write to me</find>
+      <find>if (len =</find>
+      <find>e</find>
+      <find>parser ne</find>
+      <find>bl</find>
+      <find>execute_flag</find>
+      <find>exec_flag</find>
+      <find>starting exec</find>
+      <find>close_with_argument</find>
+      <find>Execu flago</find>
+      <find>npages</find>
     </findStrings>
     <replaceStrings>
       <replace>printf(</replace>
     </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -182,6 +201,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -225,7 +245,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -267,7 +286,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.112223394" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -342,6 +360,13 @@
     <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/serial_w32.c">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm32.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6001">
+          <caret line="353" column="46" selection-start-line="353" selection-start-column="46" selection-end-line="353" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/parsers/parser.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="731">
@@ -356,6 +381,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="697">
           <caret line="41" column="12" selection-start-line="41" selection-end-line="41" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/c_imports/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="29" column="14" selection-start-line="29" selection-start-column="14" selection-end-line="29" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#43#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -376,34 +411,17 @@
     <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/serial_posix.c">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm32.c">
+    <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="579">
-          <caret line="353" column="46" selection-start-line="353" selection-start-column="46" selection-end-line="353" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/c_imports/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="29" column="14" selection-start-line="29" selection-start-column="14" selection-end-line="29" selection-end-column="14" />
-          <folding>
-            <element signature="e#0#43#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="375">
+          <caret line="1025" column="32" selection-start-line="1025" selection-start-column="32" selection-end-line="1025" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="531">
-          <caret line="580" lean-forward="true" selection-start-line="580" selection-end-line="580" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/c_imports/stm32flash/stm_py.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="1020" column="26" lean-forward="true" selection-start-line="1020" selection-start-column="26" selection-end-line="1020" selection-end-column="26" />
+        <state relative-caret-position="-1337">
+          <caret line="649" column="29" lean-forward="true" selection-start-line="649" selection-start-column="29" selection-end-line="649" selection-end-column="29" />
         </state>
       </provider>
     </entry>

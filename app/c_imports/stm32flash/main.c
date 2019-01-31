@@ -644,6 +644,7 @@ int parse_options(int argc, char **argv)
 					return 1;
 				}
 				npages = strtoul(optarg, NULL, 0);
+				printf("npages to erase count is %d \n", npages);
 				if (npages > 0xFF || npages < 0) {
 					fprintf(stderr, "ERROR: You need to specify a page count between 0 and 255");
 					return 1;

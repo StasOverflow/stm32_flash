@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#Py charm crap
+**.idea
+
 # C extensions
 *.so
 
