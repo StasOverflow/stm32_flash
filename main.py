@@ -1,5 +1,8 @@
-from app import bootstrap
+from app.application import Stm32Flash
 
 
 if __name__ == '__main__':
-    bootstrap.launch()
+    session = Stm32Flash()
+    session.launch()
+
+
