@@ -1,32 +1,46 @@
+import sys
 from app.back.back_data import AppData
 from .gui.gui import GuiApplication
+from app.gui.base.utils import staying_alive
 import threading
-
-from itertools import cycle
 
 
 class Stm32Flash:
-    STRING = (
-        ("Ah", 0.5),
-        ("Ah", 0.5),
-        ("Ah", 0.5),
-        ("Ah", 0.5),
-        ("Staying_alive", 1),
-        ("Staying_alive", 1),
 
-    )
-    iterator = cycle(STRING)
+    def __init__(self, **kwargs):
+        self._appdata = AppData()
 
-    def data_collect(self):
-        val = next(self.iterator)
-        text = val[0]
-        delay = val[1]
-        print(text)
-        threading.Timer(delay, self.data_collect).start()
+        kwargs.setdefault('close_handler', self.close)
+        self._close_handler = kwargs['close_handler']
+
+        self._data_thread = threading.Thread(target=self.input_data_collector)
+        self._back_thread = threading.Thread(target=self.background_loop_app)
+
+        self._data_thread.daemon = True
+        self._back_thread.daemon = True
+
+        self._data_thread.start()
+        self._back_thread.start()
+        self.gui_app()
+
+    def input_data_collector(self):
+        """
+            A function that should trigger gui provided interface functions
+            to get commands from front-end part of the app
+        """
+        pass
+
+    def background_loop_app(self):
+        staying_alive()
+
+    def gui_app(self):
+        ports_property = self._appdata.serial_ports_available_ref_get()
+        app = GuiApplication(ports_property=ports_property, close_handler=self._close_handler)
 
     def launch(self):
-        appdata = AppData()
+        # self.data_collect()
+        pass
 
-        ref_property = appdata.serial_ports_available_ref_get()
-        self.data_collect()
-        app = GuiApplication(ref_property)
+    def close(self):
+        sys.exit()
+
