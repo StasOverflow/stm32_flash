@@ -12,7 +12,11 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None,
                           style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
                           size=kwargs['size'], pos=kwargs['pos'])
+        self.Center()
         panel = Panel(self, **kwargs)
         # frame.Bind(wx.EVT_CLOSE, OnClose)
         # print('binded', self)
         self.Show()
+
+    def input_data_get(self):
+        return {'hata': 2, 'na': 3, 'tata': 4}

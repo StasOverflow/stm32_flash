@@ -1,12 +1,11 @@
 import wx
-from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleChoice, InputFile
+from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleChoice, InputFile, SettingsCheckBox
 
 
 class FileSequence(wx.Panel):
 
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        self.quote = wx.StaticText(self, label="OTHER PANELIO INDICATOR :", pos=(500, 500))
     #     super().__init__(self, parent)
         # super().__init__(parent, "Open", "", "",
         #                          "Python files (*.py)|*.py",
@@ -21,9 +20,10 @@ class FileSequence(wx.Panel):
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
         self._size = kwargs['size']
+
         wx.Panel.__init__(self, parent, size=self._size)
 
-        self.quote = wx.StaticText(self, label="OTHER PANELIO INDICATOR :", pos=(500, 500))
+        # self.quote = wx.StaticText(self, label="OTHER PANELIO INDICATOR :", pos=(500, 500))
         """
             A multiline TextCtrl - This is here to show 
             how the events work in this program, don't pay 
@@ -47,9 +47,10 @@ class Panel(wx.Panel):
         kwargs.setdefault('ports_property', [None, None])
         ports_property = kwargs['ports_property']
         print('ports property is', ports_property)
+        self.dyn_flex_dc = None
         self.port_box = DynamicFlexibleChoice(self, label='Device port',
                                               property_to_display=ports_property,
-                                              pos=(20, 20), width=110)
+                                              pos=(20, 20), width=110, dc=self.dyn_flex_dc)
         self.Bind(self.port_box.event_on_choice, self.evt_combo_box, self.port_box)
 
         # Choice 2
@@ -61,11 +62,10 @@ class Panel(wx.Panel):
         self.Bind(self.port_box.event_on_choice, self.evt_combo_box, self.baud_box)
 
         # File Input
-        self.file_input_box = InputFile(self)
-
+        self._file_path = InputFile(self, label='File path:', pos=(20, 60))
 
         # Checkbox
-        self.insure = wx.CheckBox(self, label="Do you want Insured Shipment ?", pos=(20, 180))
+        self.insure = wx.CheckBox(self, label='Do you want Insured Shipment ?', pos=(20, 180))
         self.Bind(wx.EVT_CHECKBOX, self.evt_check_box, self.insure)
 
         # Radio Boxes
@@ -77,8 +77,19 @@ class Panel(wx.Panel):
         self.Bind(wx.EVT_RADIOBOX, self.evt_radio_box, rb)
         parent.Bind(wx.EVT_CLOSE, self.on_close)
 
-        # Dialogio
-        self._file_dialog = FileSequence(self)
+        # Settings sequence
+        self.settings_label = wx.StaticText(self, label="Settings:", pos=(20, 100))
+        self.settings_dc = None
+        self.erasing = SettingsCheckBox(self, label='Erase', pos=(20, 125), checked=True, dc=self.settings_dc)
+
+        self.verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True, dc=self.settings_dc)
+
+        # Advanced settings sequence
+        self.settings_label = wx.StaticText(self, label="Advanced:", pos=(210, 100))
+        self.reset = SettingsCheckBox(self, label='Reset', pos=(210, 125), checked=True)
+
+        self.Verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True)
+
 
     def evt_radio_box(self, event):
         pass
@@ -90,7 +101,7 @@ class Panel(wx.Panel):
 
     def on_click(self, event):
         pass
-        self._file_dialog.summon()
+        # self._file_dialog.summon()
         self.logger.AppendText(" Click on object with Id %d\n" % event.GetId())
 
     def evt_text(self, event):
