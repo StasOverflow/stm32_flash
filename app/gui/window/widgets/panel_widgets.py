@@ -5,6 +5,8 @@ from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleCho
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
         self._size = kwargs['size']
+        self._read_action_handler = kwargs['read_handler']
+        self._write_action_handler = kwargs['write handler']
         wx.Panel.__init__(self, parent, size=self._size)
 
         self.interface_values = kwargs['vals']
@@ -14,8 +16,8 @@ class Panel(wx.Panel):
         #     self._mah_dict['gjegorz'] = 'vasiliy'
 
         # Choice 1
-        kwargs.setdefault('ports_property', [None, None])
-        ports_property = kwargs['ports_property']
+        kwargs.setdefault('ports_getter', [None, None])
+        ports_property = kwargs['ports_getter']
         print('ports property is', ports_property)
         self.dyn_flex_dc = None
         self.port_box = DynamicFlexibleChoice(self, label='Device port',
@@ -24,8 +26,9 @@ class Panel(wx.Panel):
         self.Bind(self.port_box.event_on_choice, self.evt_combo_box, self.port_box)
 
         # Choice 2
-        kwargs.setdefault('baud_property', [None, None])
-        baud_property = kwargs['baud_property']
+        # kwargs.setdefault('baud_list', [None, None])
+        baud_property = kwargs['baud_list']
+        # print(baud_property)
         self.baud_box = StaticFlexibleChoice(self, label='Baudrate',
                                              property_to_display=baud_property,
                                              pos=(240, 20), width=100)
@@ -48,12 +51,12 @@ class Panel(wx.Panel):
         button_pos_x = 310
 
         # Execute Write operation
-        self.button_read = wx.Button(self, label="Write", pos=(button_pos_x, 155))
-        # self.Bind(wx.EVT_BUTTON, self.on_click, self.button)
+        self.button_write = wx.Button(self, label="Write", pos=(button_pos_x, 155))
+        self.Bind(wx.EVT_BUTTON, self.on_press_write, self.button_write)
 
         # Execute Read operation
-        self.button_write = wx.Button(self, label="Read", pos=(button_pos_x, 185))
-        # self.Bind(wx.EVT_BUTTON, self.on_click, self.button)
+        self.button_read = wx.Button(self, label="Read", pos=(button_pos_x, 185))
+        self.Bind(wx.EVT_BUTTON, self.on_press_read, self.button_read)
 
         # Status progress bar
         self.status_bar = wx.Gauge(self, range=100, pos=(20, 157), size=(230, 20))
@@ -64,6 +67,14 @@ class Panel(wx.Panel):
         self.status_update('JinjaMe')
 
         parent.Bind(wx.EVT_CLOSE, self.on_close)
+
+    def on_press_read(self, event):
+        self._read_action_handler()
+        pass
+
+    def on_press_write(self, event):
+        self._write_action_handler()
+        pass
 
     def interface_values_get(self):
         return self.interface_values

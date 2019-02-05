@@ -10,16 +10,16 @@ class StaticFlexibleChoice(wx.Choice):
         self.width = width
         self.height = height
         self.label = wx.StaticText(parent, label=label, pos=(self.pos_x, self.pos_y+5))
-        self._property_to_display = property_to_display
+        print(type(property_to_display))
+        self._property = dict(zip(property_to_display, list(map(int, property_to_display))))
 
-        self.sampleList = self.choices_data
-        super().__init__(parent, pos=(self.pos_x+width - 40, self.pos_y), size=(95, -1), choices=self.sampleList)
+        super().__init__(parent, pos=(self.pos_x+width - 40, self.pos_y), size=(95, -1), choices=self.choices_data)
         self._event_on_choice = wx.EVT_CHOICE
 
     @property
     def choices_data(self):
-        if callable(self._property_to_display):
-            data = self._property_to_display()
+        if self._property is not None:
+            data = list(self._property.keys())[5:16]
         else:
             data = ['Sample data 1', 'Sample data 2']
         return data
@@ -45,8 +45,7 @@ class DynamicFlexibleChoice(wx.Choice):
         self.label = wx.StaticText(parent, label=label, pos=(pos[0], pos[1]+5))
         self._property_to_display = property_to_display
 
-        self.sampleList = self.choices_data
-        super().__init__(parent, pos=(pos[0]+70, pos[1]), size=(95, -1), choices=self.sampleList)
+        super().__init__(parent, pos=(pos[0]+70, pos[1]), size=(95, -1), choices=self.choices_data)
         self._event_on_choice = wx.EVT_CHOICE
         self.data_update()
 
@@ -58,9 +57,9 @@ class DynamicFlexibleChoice(wx.Choice):
             data = ['Sample data 1', 'Sample data 2']
         return data
 
-    @execute_every(500)
+    @execute_every
     def data_update(self):
-        if self.Items != self.choices_data:
+        if self.GetItems() != self.choices_data:
             self.Clear()
             self.Append(self.choices_data)
 

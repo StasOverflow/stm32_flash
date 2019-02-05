@@ -919,6 +919,31 @@ static PyObject* closing_sequence(PyObject * self, PyObject * args, PyObject * k
     return Py_None;
 //	fprintf(diag, "\n");
 }
+
+
+static PyObject* baud_list(PyObject * self, PyObject * args)
+{
+    PyObject *lst = PyList_New(SERIAL_BAUD_INSTANCES_COUNT);
+
+    if (!lst)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < SERIAL_BAUD_INSTANCES_COUNT; i++) {
+        PyObject *val = PyUnicode_FromFormat("%lu", serial_get_baud_int(i));
+        if (!val) {
+            Py_DECREF(lst);
+            return NULL;
+        }
+        PyList_SET_ITEM(lst, i, val);   // reference to num stolen
+    }
+
+    return lst;
+
+
+//    Py_XDECREF(keywds);
+
+}
 // Our Python binding to our C function
 /* here we had some pyc function */
 
@@ -950,6 +975,7 @@ static PyMethodDef stm32_flash_methods[] = {
                     METH_VARARGS | METH_KEYWORDS,
                     "sample method namba 2"
     },
+    { "baud_list_get", baud_list, METH_NOARGS, "function, returning a list of available baud rates"},
     { NULL, NULL, 0, NULL }
 };
 
@@ -984,6 +1010,7 @@ static PyObject* polled_method(PyObject * self, PyObject * args, PyObject * keyw
 
     return Py_None;
 }
+
 
 
 static PyObject* pull_method(PyObject * self, PyObject * args, PyObject * keywds)

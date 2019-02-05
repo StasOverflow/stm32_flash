@@ -8,16 +8,16 @@ def print_kwargs(**kwargs):
         print("The value of {} is {}".format(key, value))
 
 
-def execute_every(delay_ms):
-    def wrap(func=None):
-        def decorator(self=None):
-            # With this instruction we change receive bound method instead of a function
-            bound_method = func.__get__(self, type(self))
-            if delay_ms is not 0:
-                wx.CallLater(delay_ms, execute_every(bound_method))
-            return bound_method()
-        return decorator
-    return wrap
+def execute_every(func):
+    # def wrap(func=None):
+    def decorator(self=None):
+        # With this instruction we change receive bound method instead of a function
+        bound_method = func.__get__(self, type(self))
+        # if  is not 0:
+        wx.CallLater(500, execute_every(bound_method))
+        return bound_method()
+    return decorator
+    # return wrap
 
 
 def staying_alive():

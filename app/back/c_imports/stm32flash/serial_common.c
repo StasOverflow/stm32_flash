@@ -152,3 +152,4 @@ unsigned int serial_get_stopbit_int(const serial_stopbit_t stopbit) {
 	}
 }
 
+
