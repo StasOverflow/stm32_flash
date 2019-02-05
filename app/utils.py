@@ -3,6 +3,11 @@ from itertools import cycle
 import threading
 
 
+def print_kwargs(**kwargs):
+    for key, value in kwargs.items():
+        print("The value of {} is {}".format(key, value))
+
+
 def execute_every(delay_ms):
     def wrap(func=None):
         def decorator(self=None):

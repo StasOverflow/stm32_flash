@@ -1,5 +1,5 @@
 import wx
-from .utils import execute_every
+from app.utils import execute_every
 
 
 class StaticFlexibleChoice(wx.Choice):
@@ -8,7 +8,6 @@ class StaticFlexibleChoice(wx.Choice):
         self._property_to_display = property_to_display
 
         self.sampleList = self.choices_data
-        print(type(self.sampleList))
         super().__init__(parent, pos=(pos[0]+width - 40, pos[1]), size=(95, -1), choices=self.sampleList)
         self._event_on_choice = wx.EVT_CHOICE
 
@@ -32,8 +31,6 @@ class DynamicFlexibleChoice(wx.Choice):
         self._property_to_display = property_to_display
 
         self.sampleList = self.choices_data
-        print(self.sampleList)
-        print(type(self.sampleList))
         super().__init__(parent, pos=(pos[0]+width - 40, pos[1]), size=(95, -1), choices=self.sampleList)
         self._event_on_choice = wx.EVT_CHOICE
         self.data_update()

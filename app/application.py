@@ -1,7 +1,7 @@
 import sys
 from app.back.back_data import AppData
 from .gui.gui import GuiApplication
-from app.gui.base.utils import staying_alive
+from app.utils import staying_alive
 import threading
 
 
@@ -10,8 +10,7 @@ class Stm32Flash:
     def __init__(self, **kwargs):
         self._appdata = AppData()
 
-        kwargs.setdefault('close_handler', self.close)
-        self._close_handler = kwargs['close_handler']
+        kwargs['close_handler'] = self.close
 
         self._data_thread = threading.Thread(target=self.input_data_collector)
         self._back_thread = threading.Thread(target=self.background_loop_app)
@@ -21,7 +20,11 @@ class Stm32Flash:
 
         self._data_thread.start()
         self._back_thread.start()
-        self.gui_app()
+
+        self._back_thread.join()
+
+        self.gui_app(**kwargs)
+
 
     def input_data_collector(self):
         """
@@ -33,9 +36,10 @@ class Stm32Flash:
     def background_loop_app(self):
         staying_alive()
 
-    def gui_app(self):
-        ports_property = self._appdata.serial_ports_available_ref_get()
-        app = GuiApplication(ports_property=ports_property, close_handler=self._close_handler)
+    def gui_app(self, **kwargs):
+        kwargs['ports_property'] = self._appdata.serial_ports_available_ref_get()
+        app = GuiApplication(**kwargs)
+        app.close()
 
     def launch(self):
         # self.data_collect()
