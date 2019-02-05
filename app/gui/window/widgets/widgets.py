@@ -2,48 +2,18 @@ import wx
 from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleChoice, InputFile, SettingsCheckBox
 
 
-class FileSequence(wx.Panel):
-
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-    #     super().__init__(self, parent)
-        # super().__init__(parent, "Open", "", "",
-        #                          "Python files (*.py)|*.py",
-        #                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-
-    # def summon(self):
-    #     self.ShowModal()
-    #     print(self.GetPath())
-    #     self.Destroy()
-
-
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
         self._size = kwargs['size']
-
         wx.Panel.__init__(self, parent, size=self._size)
 
-        # self.quote = wx.StaticText(self, label="OTHER PANELIO INDICATOR :", pos=(500, 500))
-        """
-            A multiline TextCtrl - This is here to show 
-            how the events work in this program, don't pay 
-            too much attention to it
-        """
-        # self.logger = wx.TextCtrl(self, pos=(300, 20), size=(200, 300), style=wx.TE_MULTILINE | wx.TE_READONLY)
+        self.interface_values = kwargs['vals']
 
-        # A button
-        self.button = wx.Button(self, label="Save", pos=(200, 325))
-        self.Bind(wx.EVT_BUTTON, self.on_click, self.button)
-
-        # # the edit control - one line version.
-        # self.lblname = wx.StaticText(self, label="Your name :", pos=(20, 60))
-        # self.editname = wx.TextCtrl(self, value="Enter here your name", pos=(150, 60), size=(140, -1))
-        # self.Bind(wx.EVT_TEXT, self.evt_text, self.editname)
-        # self.Bind(wx.EVT_CHAR, self.evt_char, self.editname)
+        # self.storage += 1
+        # if self.storage == 10:
+        #     self._mah_dict['gjegorz'] = 'vasiliy'
 
         # Choice 1
-        # for key, value in kwargs.items():
-        #     print("The value of {} is {}".format(key, value))
         kwargs.setdefault('ports_property', [None, None])
         ports_property = kwargs['ports_property']
         print('ports property is', ports_property)
@@ -64,32 +34,45 @@ class Panel(wx.Panel):
         # File Input
         self._file_path = InputFile(self, label='File path:', pos=(20, 60))
 
-        # Checkbox
-        self.insure = wx.CheckBox(self, label='Do you want Insured Shipment ?', pos=(20, 180))
-        self.Bind(wx.EVT_CHECKBOX, self.evt_check_box, self.insure)
-
-        # Radio Boxes
-        radio_list = ['blue', 'red', 'yellow', 'orange', 'green', 'purple', 'navy blue', 'black', 'gray']
-        rb = wx.RadioBox(self, label="What color would you like ?",
-                         pos=(20, 210), choices=radio_list,
-                         majorDimension=3,
-                         style=wx.RA_SPECIFY_COLS)
-        self.Bind(wx.EVT_RADIOBOX, self.evt_radio_box, rb)
-        parent.Bind(wx.EVT_CLOSE, self.on_close)
-
         # Settings sequence
         self.settings_label = wx.StaticText(self, label="Settings:", pos=(20, 100))
         self.settings_dc = None
-        self.erasing = SettingsCheckBox(self, label='Erase', pos=(20, 125), checked=True, dc=self.settings_dc)
+        self.erasing = SettingsCheckBox(self, label='Erase', pos=(20, 125), checked=True)
 
-        self.verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True, dc=self.settings_dc)
+        self.verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True)
 
         # Advanced settings sequence
         self.settings_label = wx.StaticText(self, label="Advanced:", pos=(210, 100))
         self.reset = SettingsCheckBox(self, label='Reset', pos=(210, 125), checked=True)
 
-        self.Verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True)
+        button_pos_x = 310
 
+        # Execute Write operation
+        self.button_read = wx.Button(self, label="Write", pos=(button_pos_x, 155))
+        # self.Bind(wx.EVT_BUTTON, self.on_click, self.button)
+
+        # Execute Read operation
+        self.button_write = wx.Button(self, label="Read", pos=(button_pos_x, 185))
+        # self.Bind(wx.EVT_BUTTON, self.on_click, self.button)
+
+        # Status progress bar
+        self.status_bar = wx.Gauge(self, range=100, pos=(20, 157), size=(230, 20))
+        self.status_bar_update(50)
+
+        # Error Text Field
+        self.err_field = wx.StaticText(self, label="Sample_text", pos=(20, 188))
+        self.status_update('JinjaMe')
+
+        parent.Bind(wx.EVT_CLOSE, self.on_close)
+
+    def interface_values_get(self):
+        return self.interface_values
+
+    def status_update(self, text):
+        self.err_field.SetLabel(text)
+
+    def status_bar_update(self, value):
+        self.status_bar.SetValue(value)
 
     def evt_radio_box(self, event):
         pass

@@ -18,7 +18,6 @@ class GuiApplication:
 
     def close(self):
         if callable(self._close_handler):
-            print('close handler summoning')
             self._close_handler()
         else:
             pass
@@ -28,5 +27,4 @@ class GuiApplication:
 
 
 if __name__ == '__main__':
-    print('gui is summoned with name = __main__')
     app = GuiApplication()

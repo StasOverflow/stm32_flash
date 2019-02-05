@@ -5,18 +5,25 @@ from .widgets.widgets import Panel
 class MainFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
-        kwargs['size'] = (440, 500)
+        kwargs['size'] = (425, 260)
         kwargs['pos'] = (0, 0)
         # self._size = kwargs['size']
 
-        wx.Frame.__init__(self, None,
-                          style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
+        style = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER
+        style = style ^ wx.MAXIMIZE_BOX
+        wx.Frame.__init__(self, None, title="STM32 flasher",
+                          style=style,
                           size=kwargs['size'], pos=kwargs['pos'])
+        icon = wx.Icon()
+        icon.CopyFromBitmap(wx.Bitmap("st.png", wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
+
         self.Center()
-        panel = Panel(self, **kwargs)
+        self.panel = Panel(self, **kwargs)
         # frame.Bind(wx.EVT_CLOSE, OnClose)
         # print('binded', self)
         self.Show()
+        self.storage = 0
 
     def input_data_get(self):
-        return {'hata': 2, 'na': 3, 'tata': 4}
+        return self.panel.interface_values_get()
