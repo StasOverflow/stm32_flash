@@ -9,11 +9,14 @@ class Panel(wx.Panel):
         self._write_action_handler = kwargs['write handler']
         wx.Panel.__init__(self, parent, size=self._size)
 
-        self.interface_values = kwargs['vals']
-
-        # self.storage += 1
-        # if self.storage == 10:
-        #     self._mah_dict['gjegorz'] = 'vasiliy'
+        self.interface_values = {
+            'port': None,
+            'baud': None,
+            'path': None,
+            'f_erase': None,
+            'f_verify': None,
+            'f_reset': None,
+        }
 
         # Choice 1
         kwargs.setdefault('ports_getter', [None, None])
@@ -23,7 +26,7 @@ class Panel(wx.Panel):
         self.port_box = DynamicFlexibleChoice(self, label='Device port',
                                               property_to_display=ports_property,
                                               pos=(20, 20), width=110, dc=self.dyn_flex_dc)
-        self.Bind(self.port_box.event_on_choice, self.evt_combo_box, self.port_box)
+        self.Bind(self.port_box.event_on_choice, self.evt_choice_port, self.port_box)
 
         # Choice 2
         # kwargs.setdefault('baud_list', [None, None])
@@ -32,21 +35,28 @@ class Panel(wx.Panel):
         self.baud_box = StaticFlexibleChoice(self, label='Baudrate',
                                              property_to_display=baud_property,
                                              pos=(240, 20), width=100)
-        self.Bind(self.port_box.event_on_choice, self.evt_combo_box, self.baud_box)
+        self.Bind(self.port_box.event_on_choice, self.evt_choice_baud, self.baud_box)
 
         # File Input
-        self._file_path = InputFile(self, label='File path:', pos=(20, 60))
+        self.file_path_unit = InputFile(self, label='File path:', pos=(20, 60))
 
         # Settings sequence
         self.settings_label = wx.StaticText(self, label="Settings:", pos=(20, 100))
-        self.settings_dc = None
-        self.erasing = SettingsCheckBox(self, label='Erase', pos=(20, 125), checked=True)
 
+        self.erasing = SettingsCheckBox(self, label='Erase', pos=(20, 125), checked=True)
+        self.Bind(wx.EVT_CHECKBOX, self.evt_erase_checkbox, self.erasing)
         self.verify = SettingsCheckBox(self, label='Verify', pos=(120, 125), checked=True)
+        self.Bind(wx.EVT_CHECKBOX, self.evt_verify_checkbox, self.verify)
+
+        self.interface_values['f_erase'] = self.erasing.flag
+        self.interface_values['f_verify'] = self.verify.flag
 
         # Advanced settings sequence
         self.settings_label = wx.StaticText(self, label="Advanced:", pos=(210, 100))
         self.reset = SettingsCheckBox(self, label='Reset', pos=(210, 125), checked=True)
+        self.Bind(wx.EVT_CHECKBOX, self.evt_reset_checkbox, self.reset)
+
+        self.interface_values['f_reset'] = self.reset.flag
 
         button_pos_x = 310
 
@@ -63,8 +73,7 @@ class Panel(wx.Panel):
         self.status_bar_update(50)
 
         # Error Text Field
-        self.err_field = wx.StaticText(self, label="Sample_text", pos=(20, 188))
-        self.status_update('JinjaMe')
+        self.err_field = wx.StaticText(self, label="", pos=(20, 188))
 
         parent.Bind(wx.EVT_CLOSE, self.on_close)
 
@@ -77,6 +86,7 @@ class Panel(wx.Panel):
         pass
 
     def interface_values_get(self):
+        self.interface_values['path'] = self.file_path_unit.path_to_file
         return self.interface_values
 
     def status_update(self, text):
@@ -85,31 +95,20 @@ class Panel(wx.Panel):
     def status_bar_update(self, value):
         self.status_bar.SetValue(value)
 
-    def evt_radio_box(self, event):
-        pass
-        self.logger.AppendText('EvtRadioBox: %d\n' % event.GetInt())
+    def evt_verify_checkbox(self, event):
+        self.interface_values['f_verify'] = event.IsChecked()
 
-    def evt_combo_box(self, event):
-        pass
-        self.logger.AppendText('EvtComboBox: %s\n' % event.GetString())
+    def evt_erase_checkbox(self, event):
+        self.interface_values['f_erase'] = event.IsChecked()
 
-    def on_click(self, event):
-        pass
-        # self._file_dialog.summon()
-        self.logger.AppendText(" Click on object with Id %d\n" % event.GetId())
+    def evt_reset_checkbox(self, event):
+        self.interface_values['f_reset'] = event.IsChecked()
 
-    def evt_text(self, event):
-        pass
-        self.logger.AppendText('EvtText: %s\n' % event.GetString())
+    def evt_choice_baud(self, event):
+        self.interface_values['baud'] = event.GetString()
 
-    def evt_char(self, event):
-        pass
-        self.logger.AppendText('EvtChar: %d\n' % event.GetKeyCode())
-        event.Skip()
-
-    def evt_check_box(self, event):
-        pass
-        self.logger.AppendText('EvtCheckBox: %d\n' % event.IsChecked())
+    def evt_choice_port(self, event):
+        self.interface_values['port'] = event.GetString()
 
     def on_close(self, event):
         print("in on close ")
@@ -125,14 +124,3 @@ class Panel(wx.Panel):
         event.Skip()
 
         # Add a handler, that informs the main program about closing
-
-
-# def OnClose(frame, event):
-#     print("im not even here")
-#     dlg = wx.MessageDialog(frame,
-#         "Do you really want to close this application?",
-#         "Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION)
-#     result = dlg.ShowModal()
-#     dlg.Destroy()
-#     if result == wx.ID_OK:
-#         frame.Destroy()

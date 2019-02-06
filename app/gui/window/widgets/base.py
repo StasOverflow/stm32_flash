@@ -88,11 +88,12 @@ class InputFile(wx.TextCtrl):
                                          "Binary files (*.bin)|*.bin|Hex files (*.hex)|*.hex",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
                                          size=(480, 266))
-        self.path_to_file = "Select a file"
+        self.caption = "Select a file"
+        self.path_to_file = ""
         print(self.file_dialog.Size)
         self.Clear()
 
-        self.write(self.path_to_file)
+        self.write(self.caption)
 
         self.button = wx.Button(parent, label="...", pos=(pos[0]+335, pos[1]-1), size=(40, 27))
         parent.Bind(wx.EVT_BUTTON, self.on_click, self.button)
@@ -100,14 +101,19 @@ class InputFile(wx.TextCtrl):
     def on_click(self, event):
         self.file_dialog.ShowModal()
         self.Clear()
-        self.path_to_file = self.file_dialog.GetPath()
-        self.write(self.path_to_file)
+        path = self.file_dialog.GetPath()
+        if path is not "":
+            self.path_to_file = path
+            self.caption = path
+        else:
+            self.caption = "Select a file"
+        self.write(self.caption)
         self.file_dialog.Close()
 
 
 class SettingsCheckBox(wx.CheckBox):
 
-    def __init__(self, parent, label='Sample_Label', pos=(1, 1), width=200, height=20, checked=False, dc=None):
+    def __init__(self, parent, label='Sample_Label', pos=(1, 1), width=200, height=20, checked=False):
 
         self.pos_x = pos[0]
         self.pos_y = pos[1]

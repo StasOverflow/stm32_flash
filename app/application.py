@@ -5,6 +5,7 @@ from app.utils import staying_alive
 import threading
 import time
 import stm32_flash
+from copy import deepcopy
 
 
 class Stm32Flash:
@@ -16,6 +17,9 @@ class Stm32Flash:
         self._appdata = AppData()
         self._ports = self._appdata.serial_ports_available
 
+        self.error_message = None
+        self.interface_data = None
+
         self._dict_accessible = True
         kwargs['close_handler'] = self.close
         kwargs['vals'] = self.VALUE_DICTIONARY
@@ -24,11 +28,13 @@ class Stm32Flash:
         kwargs['write handler'] = self.write_action_handler
 
         self._port_poller = threading.Thread(target=self.port_poll)
-        self._input_data = threading.Thread(target=self.input_data_collector)
+        self._input_data_thread = threading.Thread(target=self.input_data_collector)
         self._back_thread = threading.Thread(target=self.background_loop_app)
         self._staying_alive = threading.Thread(target=staying_alive)
+        self._error_handler = threading.Thread(target=self.error_handler)
 
-        self._input_data.daemon = True
+        self._error_handler.daemon = True
+        self._input_data_thread.daemon = True
         self._back_thread.daemon = True
         self._staying_alive.daemon = True
         self._port_poller.daemon = True
@@ -36,6 +42,25 @@ class Stm32Flash:
         # kwargs['dict_lock'] = self._dict_lock
 
         self.gui_app(**kwargs)
+
+    @property
+    def error_message(self):
+        return self._error_message
+
+    @error_message.setter
+    def error_message(self, msg):
+        self._error_message = msg
+
+    def error_handler(self):
+        self.error_message = 1
+        while True:
+            self.error_message += 1
+            self._app.frame.panel.status_update(str(self.error_message))
+            time.sleep(.2)
+
+    def error_message_update(self, string):
+        # self.
+        pass
 
     def ports(self):
         return self._ports
@@ -47,9 +72,7 @@ class Stm32Flash:
         """
         while True:
             if self._app is not None:
-                # print(
-                    self._app.input_data_get()
-                # )
+                self.interface_data = deepcopy(self._app.input_data_get())
             time.sleep(.1)
 
     def background_loop_app(self):
@@ -70,10 +93,11 @@ class Stm32Flash:
     def launch(self):
         if self._app is not None:
 
-            self._input_data.start()
+            self._input_data_thread.start()
             self._back_thread.start()
             self._staying_alive.start()
             self._port_poller.start()
+            self._error_handler.start()
             if self._app is not None:
                 self._app.launch()
                 self._app.close()
