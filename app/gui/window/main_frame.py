@@ -14,9 +14,9 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="STM32 flasher",
                           style=style,
                           size=kwargs['size'], pos=kwargs['pos'])
-        icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap("st.png", wx.BITMAP_TYPE_ANY))
-        self.SetIcon(icon)
+        # icon = wx.Icon()
+        # icon.CopyFromBitmap(wx.Bitmap("st.png", wx.BITMAP_TYPE_ANY))
+        # self.SetIcon(icon)
 
         self.Center()
         self.panel = Panel(self, **kwargs)
@@ -27,3 +27,13 @@ class MainFrame(wx.Frame):
 
     def input_data_get(self):
         return self.panel.interface_values_get()
+
+    @property
+    def action_is_on_going(self):
+        return self.panel.action_is_on_going
+
+    @action_is_on_going.setter
+    def action_is_on_going(self, value):
+        self.panel.action_is_on_going = value
+
+

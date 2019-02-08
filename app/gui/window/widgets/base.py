@@ -19,7 +19,7 @@ class StaticFlexibleChoice(wx.Choice):
     @property
     def choices_data(self):
         if self._property is not None:
-            data = list(self._property.keys())[5:16]
+            data = list(self._property.keys())[5:9]
         else:
             data = ['Sample data 1', 'Sample data 2']
         return data
@@ -70,7 +70,7 @@ class DynamicFlexibleChoice(wx.Choice):
 
 class InputFile(wx.TextCtrl):
 
-    def __init__(self, parent, label='Sample_Label', pos=(1, 1), width=395, height=40):
+    def __init__(self, parent, label='Sample_Label', pos=(1, 1), width=395, height=40, callback=None):
         print('pos is ', pos)
         self.label = wx.StaticText(parent, label=label, pos=(pos[0], pos[1]+5))
 
@@ -85,30 +85,20 @@ class InputFile(wx.TextCtrl):
                          style=wx.TE_READONLY)
 
         self.file_dialog = wx.FileDialog(parent, "Open", "", "",
-                                         "Binary files (*.bin)|*.bin|Hex files (*.hex)|*.hex",
+                                         "Binary files (*.bin)|*.bin|Hex files (*.hex)|*.hex|Any file (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
                                          size=(480, 266))
         self.caption = "Select a file"
         self.path_to_file = ""
+
         print(self.file_dialog.Size)
         self.Clear()
 
         self.write(self.caption)
 
         self.button = wx.Button(parent, label="...", pos=(pos[0]+335, pos[1]-1), size=(40, 27))
-        parent.Bind(wx.EVT_BUTTON, self.on_click, self.button)
-
-    def on_click(self, event):
-        self.file_dialog.ShowModal()
-        self.Clear()
-        path = self.file_dialog.GetPath()
-        if path is not "":
-            self.path_to_file = path
-            self.caption = path
-        else:
-            self.caption = "Select a file"
-        self.write(self.caption)
-        self.file_dialog.Close()
+        if callback is not None and callable(callback):
+            parent.Bind(wx.EVT_BUTTON, callback, self.button)
 
 
 class SettingsCheckBox(wx.CheckBox):

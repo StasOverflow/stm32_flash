@@ -6,24 +6,33 @@ import threading
 import time
 import stm32_flash
 from copy import deepcopy
+from stm32loader.stm32loader import Stm32Loader
+import os
 
 
 class Stm32Flash:
+    ACTION_READ = 1
+    ACTION_WRITE = 2
 
     VALUE_DICTIONARY = {}
+    ACTION_TYPE = (
+        (ACTION_READ, 'ACTION_READ'),
+        (ACTION_WRITE, 'ACTION_WRITE'),
+    )
 
     def __init__(self, **kwargs):
         self._app = None
         self._appdata = AppData()
         self._ports = self._appdata.serial_ports_available
 
-        self.error_message = None
+        self._error_message = None
         self.interface_data = None
 
-        self._dict_accessible = True
+        self.write_action = False
+        self.read_action = False
+
         kwargs['close_handler'] = self.close
         kwargs['vals'] = self.VALUE_DICTIONARY
-        kwargs['dict_accessible'] = self._dict_accessible
         kwargs['read_handler'] = self.read_action_handler
         kwargs['write handler'] = self.write_action_handler
 
@@ -39,28 +48,33 @@ class Stm32Flash:
         self._staying_alive.daemon = True
         self._port_poller.daemon = True
 
-        # kwargs['dict_lock'] = self._dict_lock
+        self.on_duty = False
 
         self.gui_app(**kwargs)
+
+    @property
+    def on_action(self):
+        return self._app.action_is_on_going
 
     @property
     def error_message(self):
         return self._error_message
 
-    @error_message.setter
-    def error_message(self, msg):
+    def error_message_set(self, msg=None, code=None):
         self._error_message = msg
+        if self.error_message is not None:
+            self._app.frame.panel.status_update(self._error_message)
+            self._app.frame.panel.error_is(code)
+
+    def read_thread_handler(self):
+        pass
 
     def error_handler(self):
-        self.error_message = 1
+        # self.error_message = 1
         while True:
-            self.error_message += 1
-            self._app.frame.panel.status_update(str(self.error_message))
-            time.sleep(.2)
-
-    def error_message_update(self, string):
-        # self.
-        pass
+            # self.error_message += 1
+            time.sleep(.5)
+            # print(stm32_flash.percents_get())
 
     def ports(self):
         return self._ports
@@ -72,18 +86,21 @@ class Stm32Flash:
         """
         while True:
             if self._app is not None:
-                self.interface_data = deepcopy(self._app.input_data_get())
+                if self.on_action is False:
+                    self.interface_data = deepcopy(self._app.input_data_get())
             time.sleep(.1)
 
     def background_loop_app(self):
-        if self._app is not None:
-            while True:
-                time.sleep(1)
+        while True:
+            if self._app is not None:
+                pass
+            time.sleep(1)
 
     def port_poll(self):
         while True:
-            self._ports = self._appdata.serial_ports_available
-            time.sleep(0.1)
+            if self.on_duty is False:
+                self._ports = self._appdata.serial_ports_available
+            time.sleep(0.3)
 
     def gui_app(self, **kwargs):
         kwargs['ports_getter'] = self.ports
@@ -106,11 +123,108 @@ class Stm32Flash:
     def close(self):
         sys.exit()
 
+    def handler_init(self, action):
+        if self.on_duty is False:
+            file_path = self.interface_data['path']
+            port = self.interface_data['port']
+            baud_rate = self.interface_data['baud']
+            baud_rate = int(baud_rate) if baud_rate is not None else None
+            if port is not None:
+                pass
+                if baud_rate is not None:
+                    if os.path.exists(file_path):
+                        permission_to_execute = True
+                    else:
+                        permission_to_execute = False
+                        self.error_message_set('Specify a path to file', 404)
+                else:
+                    permission_to_execute = False
+                    self.error_message_set('Specify a baudrate', 404)
+            else:
+                permission_to_execute = False
+                self.error_message_set('Specify a device port', 404)
+
+            if permission_to_execute:
+                self.on_duty = True
+                reset = self.interface_data['f_reset']
+                erase = True if self.interface_data['f_erase'] is False else False
+                verify = self.interface_data['f_verify']
+
+                self._app.action_is_on_going = False
+
+                self.error_message_set(('Started ' + ('writning' if action == self.ACTION_WRITE else 'reading') +
+                                        ' operation'), None)
+                message = 'Done ' + ('writning' if action == self.ACTION_WRITE else 'reading')
+
+                kw_dict = {
+                    'port': port,
+                    'file_path': file_path,
+                    'action': action,
+                    'baud_rate': baud_rate,
+                    'device': port,
+                    'reset': reset,
+                    'execute_flag': 1,
+                    'callback': self.status_bar_update,
+                    'verify': verify,
+                    'erase': erase,
+                    'message': message,
+                }
+
+                t = threading.Thread(target=self.launch_da_thread, kwargs=kw_dict)
+
+                t.daemon = True
+                t.start()
+
     def read_action_handler(self):
-        print('read pressed')
-        pass
+        self.handler_init(self.ACTION_READ)
 
     def write_action_handler(self):
-        print('write pressed')
-        pass
+        self.handler_init(self.ACTION_WRITE)
+
+    def launch_da_thread(self, **kwargs):
+        print(kwargs)
+        port = kwargs['port']
+        file_path_passed = kwargs['file_path']
+        action = kwargs['action']
+        baud_rate_passed = kwargs['baud_rate']
+        callback = kwargs['callback']
+        message = kwargs['message']
+        loader = Stm32Loader(logger=self._app.frame.panel.status_update)
+
+        argums = list()
+        argums.append('-p')
+        argums.append(port)
+        argums.append('-b')
+        argums.append(str(baud_rate_passed))
+        if action == self.ACTION_READ:
+            argums.append('-r')
+            argums.append('-v')
+        else:
+            argums.append('-e')
+            argums.append('-w')
+            argums.append('-v')
+
+        argums.append('-B')
+        argums.append('-R')
+        argums.append('-g')
+        argums.append('0x08000000')
+        try:
+            argums.append(file_path_passed)
+            loader.parse_arguments(argums, callback=callback)
+            loader.connect()
+            try:
+                loader.read_device_details()
+                loader.perform_commands()
+            finally:
+                loader.reset()
+                self.status_bar_update(100)
+                time.sleep(1)
+                self.error_message_set(message, 200)
+        finally:
+            self.on_duty = False
+        print('on duty is false')
+        self.on_duty = False
+
+    def status_bar_update(self, value):
+        self._app.frame.panel.status_bar_update(value)
 

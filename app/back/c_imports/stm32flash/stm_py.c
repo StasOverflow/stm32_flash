@@ -119,9 +119,7 @@ static PyObject* open_da_port(PyObject *self, PyObject *args, PyObject *keywds)
 	    printf("Interface %s: %s\n", port->name, port->get_cfg_str(port));
 	}
 
-    Py_XDECREF(kwlist);
     Py_XDECREF(args);
-    Py_XDECREF(keywds);
 
 	return Py_None;
 }
@@ -355,6 +353,55 @@ static PyObject* close_da_stm(PyObject * self, PyObject * args)
  *      Perform an action, based on the argument passed
  *
  **********************************************************************************************************************/
+static double percents = 0;
+
+static PyObject *percents_set(PyObject *self, PyObject *args, PyObject * keywds)
+{
+    double value;
+
+    static char         *kwlist[] = {
+                            "value",
+                            NULL,
+                        };
+
+    if( !PyArg_ParseTupleAndKeywords(
+            args, keywds, "d|", kwlist, &value
+        ))
+    {
+        return NULL;
+    }
+
+    percents = value;
+    printf("value is %f", percents);
+
+    Py_XDECREF(args);
+    Py_XDECREF(kwlist);
+
+    return Py_None;
+}
+
+
+static PyObject *percents_get(PyObject *self, PyObject *args)
+{
+    PyObject *value = PyUnicode_FromFormat("%d", percents);
+
+    printf("percents are %f", percents);
+    Py_XDECREF(args);
+
+    return value;
+}
+
+void percentage_update( double new_value )
+{
+    percents = new_value;
+}
+
+double percentage_get( void )
+{
+    return percents;
+}
+
+
 
 static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * keywds)
 {
@@ -371,6 +418,8 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
     int             exec_flag       = 0;
     unsigned long   execute_addr    = 0;
 
+    PyObject *py_callback = Py_None;
+
     static char     *kwlist[] = {
                         "action",
                         "file_path",
@@ -384,14 +433,16 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                         "retry",
                         "execute_flag",
                         "execute_addr",
+                        "callback",
 
                          NULL
                     };
 
     if( !PyArg_ParseTupleAndKeywords(
-            args, keywds, "is|kkiiiiiiik", kwlist,
+            args, keywds, "is|kkiiiiiiikO", kwlist,
             &action, &file_path, &start_addr, &readwrite_len, &no_erase,
-            &npages, &spage, &reset_flag, &verify, &retry, &exec_flag, &execute_addr
+            &npages, &spage, &reset_flag, &verify, &retry, &exec_flag,
+            &execute_addr, &py_callback
         ))
     {
         return NULL;
@@ -416,6 +467,17 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
      * and using device memory size, compute
      *      start, end, first_page, num_pages
      */
+
+    printf("Otletaem pered checkom \n");
+    if (!PyCallable_Check(py_callback))
+    {
+        PyErr_SetString(PyExc_TypeError, "Need a callable object!");
+    }
+    else
+    {
+        printf("allrighty, we can call to a callback \n");    // Build up the argument list...
+    }
+
 
     if( !stm )
     {
@@ -560,12 +622,14 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                     addr += len;
 
                     // TODO: Replace this output with smth
-        //            fprintf(diag,
-        //                "\rRead address 0x%08x (%.2f%%) ",
-        //                addr,
-        //                (100.0f / (float)(end - start)) * (float)(addr - start)
-        //            );
-        //            fflush(diag);
+//                    printf("\rRead address 0x%08lx (%.2f%%) ",
+//                        addr,
+//                        (100.0f / (float)(end - start)) * (float)(addr - start)
+//                    );
+                    int cal = (100.0f / (float)(end - start)) * (float)(addr - start);
+                    PyObject *arglist = Py_BuildValue("(i)", cal );
+
+                    PyObject *result = PyEval_CallObject(py_callback, arglist);
                 }
 
                 printf("Done, now close all stuff\n");
@@ -763,7 +827,10 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                                         return Py_None;
                                     }
                                     ++failed;
+                                    break;
                                 }
+
+				                failed = 0;
                             }
                         }
 //                        printf("Breaking bad \n");
@@ -775,14 +842,17 @@ static PyObject *perform_da_action(PyObject *self, PyObject *args, PyObject * ke
                     addr	+= len;
                     offset	+= len;
 
-                    printf(
-                        "\rWrote %saddress 0x%08lx (%.2f%%) ",
-                        verify ? "and verified " : "",
-                        addr,
-                        (100.0f / size) * offset
-                    );
-//                    fflush(diag);
+//                    printf(
+//                        "\rWrote %saddress 0x%08lx (%.2f%%) ",
+//                        verify ? "and verified " : "",
+//                        addr,
+//                        (100.0f / size) * offset
+//                    );
 
+                    int cal = (100.0f / size) * offset;
+                    PyObject *arglist = Py_BuildValue("(i)", cal );
+
+                    PyObject *result = PyEval_CallObject(py_callback, arglist);
                 }
 
                 printf("Done.\n");
@@ -976,6 +1046,9 @@ static PyMethodDef stm32_flash_methods[] = {
                     "sample method namba 2"
     },
     { "baud_list_get", baud_list, METH_NOARGS, "function, returning a list of available baud rates"},
+    { "percents_get", percents_get, METH_NOARGS, "blah"},
+    { "percents_set", (PyCFunction) percents_set, METH_KEYWORDS},
+
     { NULL, NULL, 0, NULL }
 };
 
@@ -1006,7 +1079,6 @@ static PyObject* polled_method(PyObject * self, PyObject * args, PyObject * keyw
     Py_XDECREF(kwlist);
     Py_XDECREF(args);
 //    Py_XDECREF(keywds);
-
 
     return Py_None;
 }
