@@ -2,6 +2,7 @@ import wx
 import wx.adv
 from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleChoice, InputFile, SettingsCheckBox
 import wx.lib.agw.pygauge as PG
+import datetime
 
 
 class Panel(wx.Panel):
@@ -106,6 +107,21 @@ class Panel(wx.Panel):
         # Status progress bar
         self.status_bar = wx.Gauge(self, range=100, pos=(20, 187), size=(230, 20), style=wx.GA_HORIZONTAL)
         self.status_bar.SetValue(0)
+
+        width = 141
+
+        self.status_under_bar_status = wx.StaticText(self, label="", pos=(0, 222), size=(width, 17),
+                                                     style=wx.ALIGN_LEFT)
+        self.status_under_bar_status.SetBackgroundColour((200, 200, 200))  # set text color
+
+        self.status_under_bar_current = wx.StaticText(self, label="", pos=(width + 1, 222), size=(width, 17),
+                                                      style=wx.ALIGN_CENTRE_HORIZONTAL)
+        self.status_under_bar_current.SetBackgroundColour((200, 200, 200))  # set text color
+        self.update_time_current()
+
+        self.status_under_bar_last_one = wx.StaticText(self, label="", pos=((width + 1) * 2, 222), size=(width, 17),
+                                                       style=wx.ALIGN_RIGHT)
+        self.status_under_bar_last_one.SetBackgroundColour((200, 200, 200))  # set text color
         # self.status_bar.SetBarColor([wx.Colour(162, 255, 178), wx.Colour(159, 176, 255)])
         # self.status_bar.SetBorderColor(wx.BLACK)
         # self.status_bar.SetBorderPadding(2)
@@ -129,6 +145,14 @@ class Panel(wx.Panel):
         #     self.button_read.Disable()
         #     self.button_write.Disable()
 
+    def update_time_current(self):
+        self.status_under_bar_current.SetLabel(datetime.datetime.now().strftime("%I:%M:%S %p"))
+        pass
+
+    def update_time_last(self):
+        self.status_under_bar_last_one.SetLabel(datetime.datetime.now().strftime("%I:%M:%S %p   "))
+        pass
+
     def error_is(self, value):
         ERROR = 404
         OK = 200
@@ -138,12 +162,15 @@ class Panel(wx.Panel):
                 self.err_icon.SetForegroundColour((255, 0, 0))  # set text color
                 self.err_icon.SetLabel('\u26A0')
                 print('got 404')
+                self.status_under_bar_status.SetLabel('   Status: ERROR')
             elif value == OK:
                 self.err_icon.SetForegroundColour((0, 255, 0))  # set text color
                 print('got 200')
+                self.status_under_bar_status.SetLabel('   Status: OK')
                 self.err_icon.SetLabel('\u2714')
         else:
             self.err_icon.Hide()
+            self.status_under_bar_status.SetLabel('   Status: Updating..')
 
     def change_mode(self, event):
         if event.IsChecked():

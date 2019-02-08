@@ -5,7 +5,7 @@ from .widgets.panel_widgets import Panel
 class MainFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
-        kwargs['size'] = (425, 260)
+        kwargs['size'] = (425, 267)
         kwargs['pos'] = (0, 0)
         # self._size = kwargs['size']
 

@@ -94,7 +94,8 @@ class Stm32Flash:
         while True:
             if self._app is not None:
                 pass
-            time.sleep(1)
+            time.sleep(.1)
+            self._app.frame.panel.update_time_current()
 
     def port_poll(self):
         while True:
@@ -222,6 +223,7 @@ class Stm32Flash:
                 self.error_message_set(message, 200)
         finally:
             self.on_duty = False
+            self._app.frame.panel.update_time_last()
         print('on duty is false')
         self.on_duty = False
 
