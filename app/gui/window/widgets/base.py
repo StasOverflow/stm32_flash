@@ -14,12 +14,13 @@ class StaticFlexibleChoice(wx.Choice):
         self._property = dict(zip(property_to_display, list(map(int, property_to_display))))
 
         super().__init__(parent, pos=(self.pos_x+width - 40, self.pos_y), size=(95, -1), choices=self.choices_data)
+        self.SetSelection(4)
         self._event_on_choice = wx.EVT_CHOICE
 
     @property
     def choices_data(self):
         if self._property is not None:
-            data = list(self._property.keys())[5:9]
+            data = list(self._property.keys())
         else:
             data = ['Sample data 1', 'Sample data 2']
         return data

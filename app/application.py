@@ -1,15 +1,3 @@
-import sys
-from app.back.back_data import AppData
-from .gui.gui import GuiApplication
-from app.utils import staying_alive
-import threading
-import time
-import stm32_flash
-from copy import deepcopy
-from stm32loader.stm32loader import Stm32Loader
-import os
-
-
 class Stm32Flash:
     ACTION_READ = 1
     ACTION_WRITE = 2
@@ -19,6 +7,17 @@ class Stm32Flash:
         (ACTION_READ, 'ACTION_READ'),
         (ACTION_WRITE, 'ACTION_WRITE'),
     )
+
+    BAUDRATE_LIST = {
+        '9600': 9600,
+        '19200': 19200,
+        '38400': 38400,
+        '57600': 57600,
+        '115200': 115200,
+        '128000': 128000,
+        '230400': 230400,
+        '256000': 256000,
+    }
 
     def __init__(self, **kwargs):
         self._app = None
@@ -105,7 +104,7 @@ class Stm32Flash:
 
     def gui_app(self, **kwargs):
         kwargs['ports_getter'] = self.ports
-        kwargs['baud_list'] = stm32_flash.baud_list_get()
+        kwargs['baud_list'] = self.BAUDRATE_LIST
         self._app = GuiApplication(**kwargs)
 
     def launch(self):
@@ -229,4 +228,16 @@ class Stm32Flash:
 
     def status_bar_update(self, value):
         self._app.frame.panel.status_bar_update(value)
+import sys
+from app.back.back_data import AppData
+from .gui.gui import GuiApplication
+from app.utils import staying_alive
+import threading
+import time
+import stm32_flash
+from copy import deepcopy
+from stm32loader.stm32loader import Stm32Loader
+
+
+import os
 
