@@ -1,3 +1,14 @@
+import os
+import sys
+from app.back.back_data import AppData
+from .gui.gui import GuiApplication
+from app.utils import staying_alive
+import threading
+import time
+from copy import deepcopy
+from stm32loader.stm32loader import Stm32Loader
+
+
 class Stm32Flash:
     ACTION_READ = 1
     ACTION_WRITE = 2
@@ -39,9 +50,7 @@ class Stm32Flash:
         self._input_data_thread = threading.Thread(target=self.input_data_collector)
         self._back_thread = threading.Thread(target=self.background_loop_app)
         self._staying_alive = threading.Thread(target=staying_alive)
-        self._error_handler = threading.Thread(target=self.error_handler)
 
-        self._error_handler.daemon = True
         self._input_data_thread.daemon = True
         self._back_thread.daemon = True
         self._staying_alive.daemon = True
@@ -68,13 +77,6 @@ class Stm32Flash:
     def read_thread_handler(self):
         pass
 
-    def error_handler(self):
-        # self.error_message = 1
-        while True:
-            # self.error_message += 1
-            time.sleep(.5)
-            # print(stm32_flash.percents_get())
-
     def ports(self):
         return self._ports
 
@@ -98,8 +100,9 @@ class Stm32Flash:
 
     def port_poll(self):
         while True:
-            if self.on_duty is False:
-                self._ports = self._appdata.serial_ports_available
+            ports = self._appdata.serial_ports_available
+            if not self.on_duty:
+                self._ports = ports
             time.sleep(0.3)
 
     def gui_app(self, **kwargs):
@@ -124,7 +127,8 @@ class Stm32Flash:
         sys.exit()
 
     def handler_init(self, action):
-        if self.on_duty is False:
+        if not self.on_duty:
+            self.on_duty = True
             file_path = self.interface_data['path']
             port = self.interface_data['port']
             baud_rate = self.interface_data['baud']
@@ -182,7 +186,6 @@ class Stm32Flash:
         self.handler_init(self.ACTION_WRITE)
 
     def launch_da_thread(self, **kwargs):
-        print(kwargs)
         port = kwargs['port']
         file_path_passed = kwargs['file_path']
         action = kwargs['action']
@@ -223,21 +226,8 @@ class Stm32Flash:
         finally:
             self.on_duty = False
             self._app.frame.panel.update_time_last()
-        print('on duty is false')
         self.on_duty = False
 
     def status_bar_update(self, value):
         self._app.frame.panel.status_bar_update(value)
-import sys
-from app.back.back_data import AppData
-from .gui.gui import GuiApplication
-from app.utils import staying_alive
-import threading
-import time
-import stm32_flash
-from copy import deepcopy
-from stm32loader.stm32loader import Stm32Loader
-
-
-import os
 

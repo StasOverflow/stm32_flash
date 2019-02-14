@@ -1,7 +1,9 @@
 import wx
 import wx.adv
-from app.gui.window.widgets.base import DynamicFlexibleChoice, StaticFlexibleChoice, InputFile, SettingsCheckBox
-import wx.lib.agw.pygauge as PG
+from app.gui.window.widgets.base import DynamicFlexibleChoice
+from app.gui.window.widgets.base import StaticFlexibleChoice
+from app.gui.window.widgets.base import InputFile
+from app.gui.window.widgets.base import SettingsCheckBox
 import datetime
 
 
@@ -57,7 +59,11 @@ class Panel(wx.Panel):
         # Choice 2
         # kwargs.setdefault('baud_list', [None, None])
         baud_property = kwargs['baud_list']
-        # print(baud_property)
+        print(baud_property)
+        for baud in baud_property.keys():
+            if baud == '115200':
+                self.interface_values['baud'] = baud_property[baud]
+
         self.baud_box = StaticFlexibleChoice(self, label='Baudrate',
                                              property_to_display=baud_property,
                                              pos=(240, 20), width=100)
@@ -135,15 +141,6 @@ class Panel(wx.Panel):
     @action_is_on_going.setter
     def action_is_on_going(self, value):
         pass
-        # self._action_is_on_going = value
-        # if self._action_is_on_going is False:
-        #     self.button_cancel.Disable()
-        #     self.button_read.Enable()
-        #     self.button_write.Enable()
-        # else:
-        #     self.button_cancel.Enable()
-        #     self.button_read.Disable()
-        #     self.button_write.Disable()
 
     def update_time_current(self):
         self.status_under_bar_current.SetLabel(datetime.datetime.now().strftime("%I:%M:%S %p"))
@@ -246,16 +243,6 @@ class Panel(wx.Panel):
         self.interface_values['port'] = event.GetString()
 
     def on_close(self, event):
-        print("in on close ")
         if event.CanVeto():
-
-            # if wx.MessageBox("You are about to close the app",
-            #                  "Please confirm",
-            #                  wx.ICON_QUESTION | wx.YES_NO) != wx.YES:
-
             event.Veto()
-                # return
-
         event.Skip()
-
-        # Add a handler, that informs the main program about closing
