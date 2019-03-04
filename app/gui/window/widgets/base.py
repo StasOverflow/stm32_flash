@@ -54,6 +54,7 @@ class DynamicFlexibleChoice(wx.Choice):
     def choices_data(self):
         if callable(self._property_to_display):
             data = self._property_to_display()
+            print(data)
         else:
             data = ['Sample data 1', 'Sample data 2']
         return data

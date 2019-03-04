@@ -89,13 +89,13 @@ class Stm32Flash:
             if self._app is not None:
                 if self.on_action is False:
                     self.interface_data = deepcopy(self._app.input_data_get())
-            time.sleep(.1)
+            time.sleep(0.2)
 
     def background_loop_app(self):
         while True:
             if self._app is not None:
                 pass
-            time.sleep(.1)
+            time.sleep(0.3)
             self._app.frame.panel.update_time_current()
 
     def port_poll(self):
@@ -117,10 +117,9 @@ class Stm32Flash:
             self._back_thread.start()
             self._staying_alive.start()
             self._port_poller.start()
-            self._error_handler.start()
-            if self._app is not None:
-                self._app.launch()
-                self._app.close()
+
+            self._app.launch()
+            self._app.close()
         # self.data_collect()
 
     def close(self):
