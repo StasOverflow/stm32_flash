@@ -10,11 +10,11 @@ class StaticFlexibleChoice(wx.Choice):
         self.width = width
         self.height = height
         self.label = wx.StaticText(parent, label=label, pos=(self.pos_x, self.pos_y+5))
-        print(type(property_to_display))
         self._property = dict(zip(property_to_display, list(map(int, property_to_display))))
 
         super().__init__(parent, pos=(self.pos_x+width - 40, self.pos_y), size=(95, -1), choices=self.choices_data)
         self.SetSelection(4)
+        # print('selecting ', self.choices_data[3])
         self._event_on_choice = wx.EVT_CHOICE
 
     @property

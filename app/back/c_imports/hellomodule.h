@@ -1,1 +1,0 @@
-#define DADA 			"dada_sample_text"
