@@ -93,7 +93,7 @@ class InputFile(wx.TextCtrl):
         self.caption = "Select a file"
         self.path_to_file = ""
 
-        print(self.file_dialog.Size)
+        # print(self.file_dialog.Size)
         self.Clear()
 
         self.write(self.caption)

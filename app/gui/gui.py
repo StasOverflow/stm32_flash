@@ -6,7 +6,6 @@ class GuiApplication:
 
     def __init__(self, *args, **kwargs):
         self._close_handler = kwargs['close_handler']
-        print(self._close_handler)
         self._action_is_on_going = False
         self.application = wx.App(False)
         self.frame = MainFrame(*args, **kwargs)

@@ -10,6 +10,7 @@ import datetime
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
         self._size = kwargs['size']
+        print(self._size)
         self._read_action_handler = kwargs['read_handler']
         self._write_action_handler = kwargs['write handler']
         wx.Panel.__init__(self, parent, size=self._size)
@@ -48,7 +49,6 @@ class Panel(wx.Panel):
         # Choice 1
         kwargs.setdefault('ports_getter', [None, None])
         ports_property = kwargs['ports_getter']
-        print('ports property is', ports_property)
         self.dyn_flex_dc = None
         self._action_is_on_going = False
         self.port_box = DynamicFlexibleChoice(self, label='Device port',
@@ -59,7 +59,6 @@ class Panel(wx.Panel):
         # Choice 2
         # kwargs.setdefault('baud_list', [None, None])
         baud_property = kwargs['baud_list']
-        print(baud_property)
         for baud in baud_property.keys():
             if baud == '115200':
                 self.interface_values['baud'] = baud_property[baud]
