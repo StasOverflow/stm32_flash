@@ -1,9 +1,10 @@
 import sys
 import glob
 import serial
+import serial.tools.list_ports_windows
 
 
-def serial_ports():
+def _serial_ports():
     """ Lists serial_uni port names
 
         :raises EnvironmentError:
@@ -30,3 +31,12 @@ def serial_ports():
         except (OSError, serial.SerialException):
             pass
     return result
+
+
+def serial_ports():
+    if sys.platform.startswith('win'):
+        devices = serial.tools.list_ports_windows.comports()
+        devices_ports = [device_object.device for device_object in devices]
+        return devices_ports
+    else:
+        raise NotImplementedError('This type of platform is not supported')

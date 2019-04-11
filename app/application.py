@@ -2,7 +2,6 @@ import os
 import sys
 from app.back.back_data import AppData
 from .gui.gui import GuiApplication
-from app.utils import staying_alive
 import threading
 import time
 from copy import deepcopy
@@ -49,11 +48,9 @@ class Stm32Flash:
         self._port_poller = threading.Thread(target=self.port_poll)
         self._input_data_thread = threading.Thread(target=self.input_data_collector)
         self._back_thread = threading.Thread(target=self.background_loop_app)
-        self._staying_alive = threading.Thread(target=staying_alive)
 
         self._input_data_thread.daemon = True
         self._back_thread.daemon = True
-        self._staying_alive.daemon = True
         self._port_poller.daemon = True
 
         self.on_duty = False
@@ -115,7 +112,6 @@ class Stm32Flash:
 
             self._input_data_thread.start()
             self._back_thread.start()
-            self._staying_alive.start()
             self._port_poller.start()
 
             self._app.launch()
@@ -155,9 +151,9 @@ class Stm32Flash:
 
                 self._app.action_is_on_going = False
 
-                self.error_message_set(('Started ' + ('writning' if action == self.ACTION_WRITE else 'reading') +
+                self.error_message_set(('Started ' + ('writing' if action == self.ACTION_WRITE else 'reading') +
                                         ' operation'), None)
-                message = 'Done ' + ('writning' if action == self.ACTION_WRITE else 'reading')
+                message = 'Done ' + ('writing' if action == self.ACTION_WRITE else 'reading')
 
                 kw_dict = {
                     'port': port,
