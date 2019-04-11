@@ -1,5 +1,5 @@
 import wx
-from .window.main_frame import MainFrame
+from .main_frame.content import MainFrame
 
 
 class GuiApplication:

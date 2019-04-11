@@ -1,5 +1,5 @@
 import wx
-from .widgets.panel_widgets import Panel
+from gui.window.widgets.panel_widgets import Panel
 
 
 class MainFrame(wx.Frame):

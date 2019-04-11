@@ -3,14 +3,15 @@ from app.utils import execute_every
 
 
 class StaticFlexibleChoice(wx.Choice):
-    def __init__(self, parent, label='Sample_Label', property_to_display=None, pos=(1, 1), width=200, height=20):
+    def __init__(self, parent, property_list, label='Sample_Label',
+                 property_to_display=None, pos=(1, 1), width=200, height=20):
 
         self.pos_x = pos[0]
         self.pos_y = pos[1]
         self.width = width
         self.height = height
         self.label = wx.StaticText(parent, label=label, pos=(self.pos_x, self.pos_y+5))
-        self._property = dict(zip(property_to_display, list(map(int, property_to_display))))
+        self._property = dict(zip(property_list, list(map(int, property_list))))
 
         super().__init__(parent, pos=(self.pos_x+width - 40, self.pos_y), size=(95, -1), choices=self.choices_data)
         self.SetSelection(4)
@@ -32,10 +33,8 @@ class StaticFlexibleChoice(wx.Choice):
 
 class DynamicFlexibleChoice(wx.Choice):
 
-    def __init__(self, parent,
-                 label='Sample_Label',
-                 property_to_display=None,
-                 pos=(1, 1), width=200, height=20, dc=None):
+    def __init__(self, parent, property_list, property_to_display=None,
+                 label='Sample_Label', pos=(1, 1), width=200, height=20, dc=None):
 
         self.pos_x = pos[0]
         self.pos_y = pos[1]
@@ -44,9 +43,12 @@ class DynamicFlexibleChoice(wx.Choice):
         self.parent = parent
 
         self.label = wx.StaticText(parent, label=label, pos=(pos[0], pos[1]+5))
-        self._property_to_display = property_to_display
-
+        self._property_to_display = property_list
+        # self.SetSelection(property_to_display)
         super().__init__(parent, pos=(pos[0]+70, pos[1]), size=(95, -1), choices=self.choices_data)
+
+        if property_to_display is not None:
+            self.SetStringSelection(property_to_display)
         self._event_on_choice = wx.EVT_CHOICE
         self.data_update()
 
@@ -56,7 +58,7 @@ class DynamicFlexibleChoice(wx.Choice):
             data = self._property_to_display()
             print(data)
         else:
-            data = ['Sample data 1', 'Sample data 2']
+            data = ['']
         return data
 
     @execute_every
@@ -72,7 +74,8 @@ class DynamicFlexibleChoice(wx.Choice):
 
 class InputFile(wx.TextCtrl):
 
-    def __init__(self, parent, label='Sample_Label', pos=(1, 1), width=395, height=40, callback=None):
+    def __init__(self, parent, label='Sample_Label', pos=(1, 1),
+                 initial_path='', width=395, height=40, callback=None):
         print('pos is ', pos)
         self.label = wx.StaticText(parent, label=label, pos=(pos[0], pos[1]+5))
 
@@ -90,8 +93,8 @@ class InputFile(wx.TextCtrl):
                                          "Binary files (*.bin)|*.bin|Hex files (*.hex)|*.hex|Any file (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
                                          size=(480, 266))
-        self.caption = "Select a file"
-        self.path_to_file = ""
+        self.caption = 'Select a file' if initial_path is '' else initial_path
+        self.path_to_file = initial_path
 
         # print(self.file_dialog.Size)
         self.Clear()

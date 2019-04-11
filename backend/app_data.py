@@ -1,5 +1,6 @@
 import configparser
 from app.back.utils import BAUDRATES
+from app.back.ports.ports import serial_ports
 
 
 class _Singleton(type):
@@ -13,11 +14,34 @@ class _Singleton(type):
 
 class AppData(metaclass=_Singleton):
 
-    DEFAULTS = {
-        'baud_rate': BAUDRATES[7],
+    PROJECT_DEFAULTS = {
+        'build_ver': 'dev',
+    }
+
+    PRESETS_DEFAULTS = {
+        'baud_rate': str(BAUDRATES[8]),
         'file_path': '',
         'device_port': '',
     }
+
+    """
+    LEGACY PIECE OF CODE
+    """
+
+    @property
+    def serial_ports_available(self):
+        self._serial_ports_available = serial_ports()
+        return self._serial_ports_available
+
+    def _serial_ports_call(self):
+        return self.serial_ports_available
+
+    def serial_ports_available_ref_get(self):
+        return self._serial_ports_call
+
+    """
+    TILL HERE
+    """
 
     @property
     def baud_rates_available(self):
@@ -29,12 +53,31 @@ class AppData(metaclass=_Singleton):
         if self._baud_rate is not None:
             return self._baud_rate
         else:
-            return self.DEFAULTS['baud_rate']
+            return self.PRESETS_DEFAULTS['baud_rate']
 
     @baud_rate.setter
     def baud_rate(self, value):
         self.changed = True
         self._baud_rate = value
+
+    @property
+    def device_port(self):
+        return self._device_port
+
+    @device_port.setter
+    def device_port(self, value):
+        print('changin device')
+        self.changed = True
+        self._device_port = value
+
+    @property
+    def file_path(self):
+        return self._file_path
+
+    @file_path.setter
+    def file_path(self, value):
+        self.changed = True
+        self._file_path = value
 
     def __init__(self):
         self.changed = True
@@ -44,25 +87,42 @@ class AppData(metaclass=_Singleton):
         self.file_path = None
         self.device_port = None
 
+        self.build_ver = None
+
+
+        self._serial_ports_available = None
+
         self.load()
 
     def load(self):
         """
         Loads data form config ini file into project's appdata
+
+        TODO: Implement behaviour, when there is no config detected
+              Implement behaviour, when one or several fields are empty
+              Implement behaviour, when new sequence is about to be added
+              to config file
         """
         config = configparser.ConfigParser()
 
-        self.device_port = self.DEFAULTS['device_port']
-        self.file_path = self.DEFAULTS['file_path']
-        self.baud_rate = self.DEFAULTS['baud_rate']
+        self.device_port = self.PRESETS_DEFAULTS['device_port']
+        self.file_path = self.PRESETS_DEFAULTS['file_path']
+        self.baud_rate = self.PRESETS_DEFAULTS['baud_rate']
+
+        self.build_ver = self.PROJECT_DEFAULTS['build_ver']
 
         if config.read('config.ini'):
             sets = config['PRESETS']
-            self.device_port = sets.get('device_port')
-            self.file_path = sets.get('file_path')
-            self.baud_rate = sets.getint('baud_rate')
-        else:
-            self.save()
+            if sets:
+                self.device_port = sets.get('device_port')
+                self.file_path = sets.get('file_path')
+                self.baud_rate = sets.get('baud_rate')
+
+            sets = config['PROJECT']
+            if sets:
+                self.build_ver = sets.get('build_ver')
+
+        self.save()
 
     def save(self):
         """
@@ -71,7 +131,10 @@ class AppData(metaclass=_Singleton):
         Method checks if certain settings are not None, transfers them into str
         format and saves them into config ini file
         """
+        print(self.changed)
         if self.changed:
+            print('SAVING')
+
             self.changed = False
             config = configparser.ConfigParser()
             config['PRESETS'] = {}
@@ -82,6 +145,12 @@ class AppData(metaclass=_Singleton):
             if self.file_path is not None:
                 presets['file_path'] = str(self.file_path)
             presets['baud_rate'] = str(self.baud_rate)
+
+            config['PROJECT'] = {}
+            presets = config['PROJECT']
+
+            if self.build_ver is not None:
+                presets['build_ver'] = str(self.build_ver)
 
             with open('config.ini', 'w') as configfile:
                 config.write(configfile)

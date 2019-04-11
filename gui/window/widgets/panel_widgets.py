@@ -1,14 +1,20 @@
 import wx
 import wx.adv
-from app.gui.window.widgets.base import DynamicFlexibleChoice
-from app.gui.window.widgets.base import StaticFlexibleChoice
-from app.gui.window.widgets.base import InputFile
-from app.gui.window.widgets.base import SettingsCheckBox
+from gui.window.widgets.base import DynamicFlexibleChoice
+from gui.window.widgets.base import StaticFlexibleChoice
+from gui.window.widgets.base import InputFile
+from gui.window.widgets.base import SettingsCheckBox
 import datetime
+from backend.app_data import AppData
 
 
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
+
+        # Fresh
+        self.appdata = AppData()
+        #####
+
         self._size = kwargs['size']
         print(self._size)
         self._read_action_handler = kwargs['read_handler']
@@ -51,8 +57,8 @@ class Panel(wx.Panel):
         ports_property = kwargs['ports_getter']
         self.dyn_flex_dc = None
         self._action_is_on_going = False
-        self.port_box = DynamicFlexibleChoice(self, label='Device port',
-                                              property_to_display=ports_property,
+        self.port_box = DynamicFlexibleChoice(self, label='Device port', property_list=ports_property,
+                                              property_to_display=self.appdata.device_port,
                                               pos=(20, 20), width=110, dc=self.dyn_flex_dc)
         self.Bind(self.port_box.event_on_choice, self.evt_choice_port, self.port_box)
 
@@ -64,12 +70,13 @@ class Panel(wx.Panel):
                 self.interface_values['baud'] = baud_property[baud]
 
         self.baud_box = StaticFlexibleChoice(self, label='Baudrate',
-                                             property_to_display=baud_property,
+                                             property_list=baud_property,
                                              pos=(240, 20), width=100)
         self.Bind(self.port_box.event_on_choice, self.evt_choice_baud, self.baud_box)
 
         # File Input
-        self.file_path_unit = InputFile(self, label='File path:', pos=(20, 60), callback=self.on_click)
+        self.file_path_unit = InputFile(self, label='File path:', initial_path=self.appdata.file_path,
+                                        pos=(20, 60), callback=self.on_click)
 
         # Settings sequence
         # self.settings_label = wx.StaticText(self, label="Settings:", pos=(20, 100))
@@ -143,11 +150,9 @@ class Panel(wx.Panel):
 
     def update_time_current(self):
         self.status_under_bar_current.SetLabel(datetime.datetime.now().strftime("%I:%M:%S %p"))
-        pass
 
     def update_time_last(self):
         self.status_under_bar_last_one.SetLabel(datetime.datetime.now().strftime("%I:%M:%S %p   "))
-        pass
 
     def error_is(self, value):
         ERROR = 404
@@ -160,7 +165,7 @@ class Panel(wx.Panel):
                 print('got 404')
                 self.status_under_bar_status.SetLabel('   Status: ERROR')
             elif value == OK:
-                self.err_icon.SetForegroundColour((0, 255, 0))  # set text color
+                self.err_icon.SetForegroundColour((0, 190, 0))  # set text color
                 print('got 200')
                 self.status_under_bar_status.SetLabel('   Status: OK')
                 self.err_icon.SetLabel('\u2714')
@@ -187,6 +192,7 @@ class Panel(wx.Panel):
         if path is not "":
             self.file_path_unit.path_to_file = path
             self.file_path_unit.caption = path
+            self.appdata.file_path = path
         else:
             self.file_path_unit.caption = "Select a file"
         self.file_path_unit.write(self.file_path_unit.caption)
@@ -236,10 +242,13 @@ class Panel(wx.Panel):
     def evt_choice_baud(self, event):
         self.status_bar_update(0)
         self.interface_values['baud'] = event.GetString()
+        self.appdata.baud_rate = self.interface_values['baud']
 
     def evt_choice_port(self, event):
         self.status_bar_update(0)
         self.interface_values['port'] = event.GetString()
+        print('evt_choice_port')
+        self.appdata.device_port = self.interface_values['port']
 
     def on_close(self, event):
         if event.CanVeto():

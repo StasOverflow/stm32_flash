@@ -89,13 +89,14 @@ class Stm32Flash:
             time.sleep(0.2)
 
     def background_loop_app(self):
+        # print('after update')
         while True:
             if self._app is not None:
                 pass
-            self._app.frame.panel.update_time_current()
-            self._appdata.save()
-            time.sleep(0.3)
 
+            self._appdata.save()
+            self._app.frame.panel.update_time_current()
+            time.sleep(0.3)
 
     def port_poll(self):
         while True:
@@ -153,9 +154,9 @@ class Stm32Flash:
 
                 self._app.action_is_on_going = False
 
-                self.error_message_set((('Writing' if action == self.ACTION_WRITE else 'Reading') +
-                                        ' operation' + 'Started '), None)
-                message = 'Done ' + ('Writing' if action == self.ACTION_WRITE else 'Reading')
+                self.error_message_set(('Started ' + ('writing' if action == self.ACTION_WRITE else 'reading') +
+                                        ' operation'), None)
+                message = 'Done ' + ('writing' if action == self.ACTION_WRITE else 'reading')
 
                 kw_dict = {
                     'port': port,
