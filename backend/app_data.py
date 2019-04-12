@@ -1,6 +1,6 @@
 import configparser
-from app.back.utils import BAUDRATES
-from app.back.ports.ports import serial_ports
+from backend.utils import BAUDRATES
+from backend.ports import serial_ports
 
 
 class _Singleton(type):
@@ -87,7 +87,6 @@ class AppData(metaclass=_Singleton):
 
         self.build_ver = None
 
-
         self._serial_ports_available = None
 
         self.load()
@@ -110,15 +109,19 @@ class AppData(metaclass=_Singleton):
         self.build_ver = self.PROJECT_DEFAULTS['build_ver']
 
         if config.read('config.ini'):
-            sets = config['PRESETS']
-            if sets:
+            try:
+                sets = config['PRESETS']
                 self.device_port = sets.get('device_port')
                 self.file_path = sets.get('file_path')
                 self.baud_rate = sets.get('baud_rate')
+            except KeyError as e:
+                pass
 
-            sets = config['PROJECT']
-            if sets:
+            try:
+                sets = config['PROJECT']
                 self.build_ver = sets.get('build_ver')
+            except KeyError as e:
+                pass
 
         self.save()
 

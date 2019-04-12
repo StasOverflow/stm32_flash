@@ -144,9 +144,9 @@ class Stm32Flash:
 
                 self._app.action_is_on_going = False
 
-                self.error_message_set(('Started ' + ('writing' if action == self.ACTION_WRITE else 'reading') +
-                                        ' operation'), None)
-                message = 'Done ' + ('writing' if action == self.ACTION_WRITE else 'reading')
+                self.error_message_set((('Writing' if action == self.ACTION_WRITE else 'Reading') +
+                                        ' Started'), None)
+                message = ('Writing' if action == self.ACTION_WRITE else 'Reading') + ' Done'
 
                 kw_dict = {
                     'port': port,

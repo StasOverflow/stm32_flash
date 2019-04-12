@@ -1,4 +1,0 @@
-!IMPORTANT:
-Should be called from INSIDE of your venv with all packages installed
-
-pyinstaller --onefile  main.py  --noconsole -n stm32_flash

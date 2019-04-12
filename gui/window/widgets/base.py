@@ -1,5 +1,4 @@
 import wx
-from app.utils import execute_every
 
 
 class StaticFlexibleChoice(wx.Choice):
