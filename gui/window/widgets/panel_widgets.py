@@ -6,13 +6,16 @@ from gui.window.widgets.base import InputFile
 from gui.window.widgets.base import SettingsCheckBox
 import datetime
 from backend.app_data import AppData
+import os
+
+import wx.lib.buttons as btns
 
 
 class Panel(wx.Panel):
     def __init__(self, parent, **kwargs):
 
         # Fresh
-        self.appdata = AppData()
+        self.app_data = AppData()
         #####
 
         self._size = kwargs['size']
@@ -53,12 +56,24 @@ class Panel(wx.Panel):
         # Choice 1
         kwargs.setdefault('ports_getter', [None, None])
         ports_property = kwargs['ports_getter']
-        self.dyn_flex_dc = None
         self._action_is_on_going = False
-        self.port_box = DynamicFlexibleChoice(self, label='Device port', property_list=ports_property,
-                                              property_to_display=self.appdata.device_port,
-                                              pos=(20, 20), width=110, dc=self.dyn_flex_dc)
+        self.port_box = DynamicFlexibleChoice(self, label='Device port',
+                                              property_list=self.app_data.device_ports_available,
+                                              property_to_display=self.app_data.device_port,
+                                              pos=(20, 20), width=110)
+
         self.Bind(self.port_box.event_on_choice, self.evt_choice_port, self.port_box)
+
+        # self.refresh_button = wx.Button(parent=self, size=(20, 23), pos=(185, 150))
+        path_to_file = './static/images/refresh_3.png'
+        if not os.path.isfile(path_to_file):
+            raise FileNotFoundError
+
+        self.refresh_button = btns.GenBitmapButton(self, wx.ID_ANY, bitmap=wx.Bitmap(path_to_file),
+                                                   style=wx.NO_BORDER | wx.BU_EXACTFIT,
+                                                   size=(20, 23), pos=(185, 20))
+
+        self.Bind(wx.EVT_BUTTON, self.evt_port_refresh, self.refresh_button)
 
         # Choice 2
         # kwargs.setdefault('baud_list', [None, None])
@@ -73,7 +88,7 @@ class Panel(wx.Panel):
         self.Bind(self.port_box.event_on_choice, self.evt_choice_baud, self.baud_box)
 
         # File Input
-        self.file_path_unit = InputFile(self, label='File path:', initial_path=self.appdata.file_path,
+        self.file_path_unit = InputFile(self, label='File path:', initial_path=self.app_data.file_path,
                                         pos=(20, 60), callback=self.on_click)
 
         # Settings sequence
@@ -187,7 +202,7 @@ class Panel(wx.Panel):
         if path is not "":
             self.file_path_unit.path_to_file = path
             self.file_path_unit.caption = path
-            self.appdata.file_path = path
+            self.app_data.file_path = path
         else:
             self.file_path_unit.caption = "Select a file"
         self.file_path_unit.write(self.file_path_unit.caption)
@@ -237,13 +252,18 @@ class Panel(wx.Panel):
     def evt_choice_baud(self, event):
         self.status_bar_update(0)
         self.interface_values['baud'] = event.GetString()
-        self.appdata.baud_rate = self.interface_values['baud']
+        self.app_data.baud_rate = self.interface_values['baud']
 
     def evt_choice_port(self, event):
         self.status_bar_update(0)
-        self.interface_values['port'] = event.GetString()
-        print('evt_choice_port')
-        self.appdata.device_port = self.interface_values['port']
+        self.app_data.device_port = event.GetString()
+
+    def evt_port_refresh(self, event):
+        self.status_bar_update(0)
+        ports = self.app_data.device_ports_available
+
+        self.port_box.Clear()
+        self.port_box.Append(ports)
 
     def on_close(self, event):
         if event.CanVeto():

@@ -31,8 +31,8 @@ class Stm32Flash:
 
     def __init__(self, **kwargs):
         self._app = None
-        self._appdata = AppData()
-        self._ports = self._appdata.serial_ports_available
+        self.app_data = AppData()
+        self._ports = self.app_data.device_ports_available
 
         self._error_message = None
         self.interface_data = None
@@ -45,13 +45,11 @@ class Stm32Flash:
         kwargs['read_handler'] = self.read_action_handler
         kwargs['write handler'] = self.write_action_handler
 
-        self._port_poller = threading.Thread(target=self.port_poll)
         self._input_data_thread = threading.Thread(target=self.input_data_collector)
         self._back_thread = threading.Thread(target=self.background_loop_app)
 
         self._input_data_thread.daemon = True
         self._back_thread.daemon = True
-        self._port_poller.daemon = True
 
         self.on_duty = False
 
@@ -94,15 +92,8 @@ class Stm32Flash:
             if self._app is not None:
                 pass
 
-            self._appdata.save()
+            self.app_data.save()
             self._app.frame.panel.update_time_current()
-            time.sleep(0.3)
-
-    def port_poll(self):
-        while True:
-            ports = self._appdata.serial_ports_available
-            if not self.on_duty:
-                self._ports = ports
             time.sleep(0.3)
 
     def gui_app(self, **kwargs):
@@ -115,7 +106,6 @@ class Stm32Flash:
 
             self._input_data_thread.start()
             self._back_thread.start()
-            self._port_poller.start()
 
             self._app.launch()
             self._app.close()
@@ -127,9 +117,9 @@ class Stm32Flash:
     def handler_init(self, action):
         if not self.on_duty:
             self.on_duty = True
-            file_path = self.interface_data['path']
-            port = self.interface_data['port']
-            baud_rate = self.interface_data['baud']
+            file_path = self.app_data.file_path
+            port = self.app_data.device_port
+            baud_rate = self.app_data.baud_rate
             baud_rate = int(baud_rate) if baud_rate is not None else None
             if port is not None:
                 pass

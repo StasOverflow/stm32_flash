@@ -28,13 +28,8 @@ class AppData(metaclass=_Singleton):
     LEGACY PIECE OF CODE
     """
 
-    @property
-    def serial_ports_available(self):
-        self._serial_ports_available = serial_ports()
-        return self._serial_ports_available
-
     def _serial_ports_call(self):
-        return self.serial_ports_available
+        return self.device_ports_available
 
     def serial_ports_available_ref_get(self):
         return self._serial_ports_call
@@ -42,6 +37,10 @@ class AppData(metaclass=_Singleton):
     """
     TILL HERE
     """
+
+    @property
+    def device_ports_available(self):
+        return serial_ports()
 
     @property
     def baud_rates_available(self):

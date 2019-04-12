@@ -34,7 +34,7 @@ class StaticFlexibleChoice(wx.Choice):
 class DynamicFlexibleChoice(wx.Choice):
 
     def __init__(self, parent, property_list, property_to_display=None,
-                 label='Sample_Label', pos=(1, 1), width=200, height=20, dc=None):
+                 label='Sample_Label', pos=(1, 1), width=200, height=20):
 
         self.pos_x = pos[0]
         self.pos_y = pos[1]
@@ -43,29 +43,11 @@ class DynamicFlexibleChoice(wx.Choice):
         self.parent = parent
 
         self.label = wx.StaticText(parent, label=label, pos=(pos[0], pos[1]+5))
-        self._property_to_display = property_list
-        # self.SetSelection(property_to_display)
-        super().__init__(parent, pos=(pos[0]+70, pos[1]), size=(95, -1), choices=self.choices_data)
+        self.property_list = property_list
+        super().__init__(parent, pos=(pos[0]+70, pos[1]), size=(95, -1), choices=self.property_list)
+        self.SetStringSelection(property_to_display)
 
-        if property_to_display is not None:
-            self.SetStringSelection(property_to_display)
         self._event_on_choice = wx.EVT_CHOICE
-        self.data_update()
-
-    @property
-    def choices_data(self):
-        if callable(self._property_to_display):
-            data = self._property_to_display()
-            # print(data)
-        else:
-            data = ['']
-        return data
-
-    @execute_every
-    def data_update(self):
-        if self.GetItems() != self.choices_data:
-            self.Clear()
-            self.Append(self.choices_data)
 
     @property
     def event_on_choice(self):

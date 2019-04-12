@@ -1,3 +1,4 @@
+import os
 import wx
 from gui.window.widgets.panel_widgets import Panel
 
@@ -14,7 +15,12 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None, title="STM32 flasher", style=style,
                           size=kwargs['size'], pos=kwargs['pos'])
         icon = wx.Icon()
-        icon.CopyFromBitmap(wx.Bitmap("st.png", wx.BITMAP_TYPE_ANY))
+
+        path_to_file = './static/images/st.png'
+        if os.path.isfile(path_to_file):
+            icon.CopyFromBitmap(wx.Bitmap(path_to_file, wx.BITMAP_TYPE_ANY))
+        else:
+            raise FileNotFoundError
         self.SetIcon(icon)
 
         self.Center()
