@@ -66,7 +66,6 @@ class AppData(metaclass=_Singleton):
 
     @device_port.setter
     def device_port(self, value):
-        print('changin device')
         self.changed = True
         self._device_port = value
 
@@ -131,7 +130,6 @@ class AppData(metaclass=_Singleton):
         Method checks if certain settings are not None, transfers them into str
         format and saves them into config ini file
         """
-        print(self.changed)
         if self.changed:
             print('SAVING')
 

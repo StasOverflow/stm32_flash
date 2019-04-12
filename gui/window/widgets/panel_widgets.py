@@ -16,7 +16,6 @@ class Panel(wx.Panel):
         #####
 
         self._size = kwargs['size']
-        print(self._size)
         self._read_action_handler = kwargs['read_handler']
         self._write_action_handler = kwargs['write handler']
         wx.Panel.__init__(self, parent, size=self._size)
@@ -38,14 +37,13 @@ class Panel(wx.Panel):
         font = wx.Font(20, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
         '''
-            family can be:
+            Font family can be:
             wx.DECORATIVE, wx.DEFAULT, wx.MODERN, wx.ROMAN, wx.SCRIPT or wx.SWISS.
 
-            style can be:
+            Font style can be:
             wx.NORMAL, wx.SLANT or wx.ITALIC.
 
-            weight can be:
-
+            Font weight can be:
             wx.NORMAL, wx.LIGHT, or wx.BOLD
         '''
 
@@ -134,9 +132,6 @@ class Panel(wx.Panel):
         self.status_under_bar_last_one = wx.StaticText(self, label="", pos=((width + 1) * 2, 222), size=(width, 17),
                                                        style=wx.ALIGN_RIGHT)
         self.status_under_bar_last_one.SetBackgroundColour((200, 200, 200))  # set text color
-        # self.status_bar.SetBarColor([wx.Colour(162, 255, 178), wx.Colour(159, 176, 255)])
-        # self.status_bar.SetBorderColor(wx.BLACK)
-        # self.status_bar.SetBorderPadding(2)
 
         parent.Bind(wx.EVT_CLOSE, self.on_close)
 

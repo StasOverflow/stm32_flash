@@ -1,4 +1,4 @@
-from app.application import Stm32Flash
+from backend.stm32flash import Stm32Flash
 
 
 if __name__ == '__main__':

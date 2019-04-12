@@ -56,7 +56,7 @@ class DynamicFlexibleChoice(wx.Choice):
     def choices_data(self):
         if callable(self._property_to_display):
             data = self._property_to_display()
-            print(data)
+            # print(data)
         else:
             data = ['']
         return data

@@ -5,7 +5,7 @@ from gui.gui import GuiApplication
 import threading
 import time
 from copy import deepcopy
-from stm32loader.stm32loader import Stm32Loader
+from backend.flasher.stm32loader import Stm32Loader
 
 
 class Stm32Flash:
